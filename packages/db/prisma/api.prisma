@@ -1,0 +1,47 @@
+enum KeyStatus {
+    ACTIVE
+    REVOKED
+}
+
+model Api {
+    id            Int           @id @default(autoincrement())
+    slug          String        @unique
+    title         String
+    description   String
+    plans         Plan[]
+    subscriptions Subcription[]
+    developer     User          @relation(fields: [developerId], references: [id])
+    developerId   Int
+}
+
+model Plan {
+    id              Int           @id @default(autoincrement())
+    price           Float
+    monthlyRequests BigInt        @default(10000)
+    hourlyRequests  BigInt        @default(1000)
+    subscription    Subcription[]
+    api             Api?          @relation(fields: [apiId], references: [id])
+    apiId           Int?
+    features        String
+}
+
+model Subcription {
+    id      Int      @id @default(autoincrement())
+    user    User     @relation(fields: [userId], references: [id])
+    userId  Int
+    api     Api      @relation(fields: [apiId], references: [id])
+    apiId   Int
+    plan    Plan     @relation(fields: [planId], references: [id])
+    planId  Int
+    apiKeys ApiKey[]
+}
+
+model ApiKey {
+    id             String      @id @default(uuid())
+    subscription   Subcription @relation(fields: [subscriptionId], references: [id])
+    subscriptionId Int
+    keyHash        String      @unique
+    status         KeyStatus   @default(ACTIVE)
+    endpoint       String      @unique
+    usages         Usage[]
+}
