@@ -4,16 +4,21 @@
     "./client": "./index.ts"
   },
   "module": "index.ts",
-  "type": "module",
-  "private": true,
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
+  "private": true,
+  "type": "commonjs",
   "dependencies": {
-    "prisma": "^6.8.2"
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.0",
+    "pg": "^8.16.3"
   }
 }

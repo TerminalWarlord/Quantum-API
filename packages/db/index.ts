@@ -1,11 +1,10 @@
-import { PrismaClient } from "./generated/prisma/client.js";
+import 'dotenv/config';
 
+export * from "./src/db/schema/users";
+export * from "./src/db/schema/api_keys";
+export * from "./src/db/schema/apis";
+export * from "./src/db/schema/plans";
+export * from "./src/db/schema/subscriptions";
+export * from "./src/db/schema/usage";
+export * from "./client";
 
-
-const globalPrisma = global as unknown as { prisma: PrismaClient };
-
-export const prisma = globalPrisma.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-    globalPrisma.prisma = prisma;
-}
