@@ -11,6 +11,8 @@ export const planTable = pgTable("plans", {
     monthly_requests: bigint({ mode: "number" }).default(10000),
     rate_limit: bigint({ mode: "number" }).default(1000),
     features: text().notNull(),
+    price_in_cents: integer().notNull(),
+    price_id: text().notNull(),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow()
 })

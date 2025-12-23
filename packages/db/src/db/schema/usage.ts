@@ -1,16 +1,15 @@
 import { integer, pgTable, timestamp, bigint } from "drizzle-orm/pg-core";
-import { subsciptionTable } from "./subscriptions";
-import { pgEnum } from "drizzle-orm/pg-core";
+import { subscriptionTable } from "./subscriptions";
 import { apiKeyTable } from "./api_keys";
+import { periodTypeEnum } from "./enums";
 
 
-export const periodTypeEnum = pgEnum("period_type", ["hour", "month"]);
 
 export const usageTable = pgTable("usages", {
     id: integer().generatedAlwaysAsIdentity().primaryKey(),
     subscription_id: integer()
         .notNull()
-        .references(() => subsciptionTable.id, { onDelete: "cascade" }),
+        .references(() => subscriptionTable.id, { onDelete: "cascade" }),
     api_key_id: integer()
         .references(() => apiKeyTable.id, { onDelete: "cascade" }),
     period_type: periodTypeEnum().default("month"),

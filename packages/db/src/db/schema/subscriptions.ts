@@ -1,12 +1,12 @@
-import { integer, pgTable, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, timestamp, text } from "drizzle-orm/pg-core";
 import { userTable } from "./users";
 import { apiTable } from "./apis";
 import { planTable } from "./plans";
-import { subscriptionStatus } from "./enums";
+import { providers, subscriptionStatus } from "./enums";
 
 
 
-export const subsciptionTable = pgTable("subscriptions", {
+export const subscriptionTable = pgTable("subscriptions", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     user_id: integer()
         .notNull()
@@ -17,7 +17,11 @@ export const subsciptionTable = pgTable("subscriptions", {
     plan_id: integer()
         .notNull()
         .references(() => planTable.id, { onDelete: "cascade" }),
+    provider: providers().default("paddle"),
+    provider_subscription_id: text().notNull().unique(),
     status: subscriptionStatus().default("active"),
+    current_period_start: timestamp().notNull(),
+    current_period_end: timestamp().notNull(),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow()
 })

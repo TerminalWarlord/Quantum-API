@@ -1,5 +1,6 @@
 import { integer, pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 import { userTable } from "./users";
+import { categoriesTable } from "./categories";
 
 
 export const apiTable = pgTable("apis", {
@@ -10,6 +11,12 @@ export const apiTable = pgTable("apis", {
         .notNull()
         .references(() => userTable.id, { onDelete: "cascade" }),
     slug: varchar({ length: 255 }).unique().notNull(),
+    category_id: integer()
+        .notNull()
+        .references(() => categoriesTable.id, { onDelete: 'cascade' }),
+    product_id: text().notNull(),
+    thumbnail_url: text(),
+    base_url: text().notNull(),
     created_at: timestamp().defaultNow(),
-    updated_at: timestamp().defaultNow()
+    updated_at: timestamp().defaultNow(),
 })
