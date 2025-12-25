@@ -3,7 +3,6 @@ import { Context } from "hono";
 import jwt from "jsonwebtoken";
 import * as z from "zod";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcrypt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
@@ -29,7 +28,7 @@ export const loginController = async (c: Context) => {
             }, 401);
         }
         const userPassword = users[0]?.password;
-        const passwordMatches = await bcrypt.compare(parsedData.data.password, userPassword!);
+        const passwordMatches = await Bun.password.verify(parsedData.data.password, userPassword!);
         if (passwordMatches) {
             // TODO: Update expiry
             const token = jwt.sign({ id: users[0]?.id }, JWT_SECRET, { expiresIn: "30d" });
@@ -47,7 +46,7 @@ export const loginController = async (c: Context) => {
     }
     return c.json({
         message: "Something went wrong"
-    }, 401);
+    }, 501);
 
 
 }

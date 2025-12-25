@@ -1,12 +1,11 @@
 import { Context } from "hono";
 import * as z from "zod";
 import { db, userTable } from "@repo/db/client";
-import bcrypt from "bcrypt";
 
 
 
 export const registerController = async (c: Context) => {
-    
+
     const schema = z.object({
         first_name: z.string().max(255),
         last_name: z.string().max(255),
@@ -21,7 +20,10 @@ export const registerController = async (c: Context) => {
         }, 401);
     }
     try {
-        const hashed = await bcrypt.hash(parsedData.data.password, 5);
+        const hashed = await Bun.password.hash(parsedData.data.password, {
+            algorithm: 'bcrypt',
+            cost: 5
+        });
         await db.insert(userTable).values({
             email: parsedData.data.email,
             first_name: parsedData.data.first_name,
