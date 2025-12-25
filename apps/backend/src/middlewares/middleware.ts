@@ -20,7 +20,7 @@ export const middleware = bearerAuth({
             if (!payload || !payload.id) {
                 return false;
             }
-            const user = await db.select({ id: userTable.id })
+            const [user] = await db.select({ id: userTable.id })
                 .from(userTable)
                 .where(eq(userTable.id, payload.id));
             if (!user) {
