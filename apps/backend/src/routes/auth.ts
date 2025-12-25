@@ -1,7 +1,6 @@
 import { Hono } from "hono";
-import { bearerAuth } from "hono/bearer-auth";
-import { registerController } from "../controllers/authControllers/register.controller";
-import { loginController } from "../controllers/authControllers/login.controller";
+import { registerController } from "../controllers/auth_controllers/register.controller";
+import { loginController } from "../controllers/auth_controllers/login.controller";
 
 
 
