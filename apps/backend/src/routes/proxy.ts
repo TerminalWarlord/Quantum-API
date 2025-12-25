@@ -7,6 +7,5 @@ const proxyRouter = new Hono();
 
 
 proxyRouter.all('/', proxyController);
-proxyRouter.all('/', proxyController);
 
 export default proxyRouter;
