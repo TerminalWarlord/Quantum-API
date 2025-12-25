@@ -1,7 +1,7 @@
 import { db, apiTable } from "@repo/db/client";
 import * as z from "zod";
 import { CustomContext } from "../../middlewares/middleware";
-import { createProduct } from "../../lib/paddle";
+import { createProduct } from "../../lib/payment_provider_helpers/paddle";
 
 export const postCreateApi = async (c: CustomContext) => {
     if (!c.token || !c.token.id) {
@@ -33,6 +33,7 @@ export const postCreateApi = async (c: CustomContext) => {
         })
         const [api] = await db.insert(apiTable).values({
             ...parseData.data,
+            thumbnail_url: parseData.data.image_url,
             product_id,
             developer_id: c.token?.id,
         }).returning({ id: apiTable.id });

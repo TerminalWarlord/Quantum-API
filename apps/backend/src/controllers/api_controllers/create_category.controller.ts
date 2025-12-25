@@ -14,8 +14,8 @@ export const postCreateCategory = async (c: Context) => {
         }, 400);
     }
     return c.json({
-        name: parsedData.data.name,
         message: "Successful",
-        slug: await createSlug(parsedData.data.name)
+        name: parsedData.data.name,
+        ...await createSlug(parsedData.data.name)
     });
 }

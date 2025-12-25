@@ -2,7 +2,7 @@ import { apiTable, db, planTable } from "@repo/db/client";
 import * as z from "zod";
 import { CustomContext } from "../../middlewares/middleware";
 import { eq } from "drizzle-orm";
-import { createPrice } from "../../lib/paddle";
+import { createPrice } from "../../lib/payment_provider_helpers/paddle";
 
 
 export const postCreatePlan = async (c: CustomContext) => {
