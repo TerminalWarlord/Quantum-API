@@ -17,30 +17,35 @@ export const registerController = async (c: Context) => {
     if (!parsedData.success) {
         return c.json({
             message: parsedData.error.flatten().fieldErrors
-        }, 401);
+        }, 400);
     }
     try {
         const hashed = await Bun.password.hash(parsedData.data.password, {
             algorithm: 'bcrypt',
             cost: 5
         });
-        await db.insert(userTable).values({
+        const [user] = await db.insert(userTable).values({
             email: parsedData.data.email,
             first_name: parsedData.data.first_name,
             last_name: parsedData.data.last_name,
             password: hashed,
             username: parsedData.data.username
-        })
+        }).returning();
+        if (!user) {
+            return c.json({
+                message: "Failed to create user"
+            }, 500);
+        }
 
         return c.json({
-            message: "User has been created"
-        });
+            message: "User has been created",
+            user_id: user.id
+        }, 201);
     }
     catch (err) {
-        console.log(err)
         return c.json({
-            message: "Something went wrong!"
-        }, 501)
+            message: "Internal Server Error!"
+        }, 500)
     }
 
 }
