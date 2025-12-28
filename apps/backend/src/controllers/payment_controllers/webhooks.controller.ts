@@ -1,6 +1,6 @@
 import { Context } from "hono";
-import { transactionCompletedHelper } from "../../lib/payment.ts/transaction_completed_helper";
-import { subscriptionActivatedHelper } from "../../lib/payment.ts/subscription_activated_helper";
+import { transactionCompletedHelper } from "../../lib/payment_provider_helpers/transaction_completed_helper";
+import { subscriptionActivatedHelper } from "../../lib/payment_provider_helpers/subscription_activated_helper";
 import { AppError } from "@repo/types";
 
 
