@@ -9,3 +9,4 @@ export const providers = pgEnum("provider", ["paddle", "dodo", "crypto"]);
 export const endpointMethods = pgEnum("endpoint_methods", ["GET", "POST", "PATCH", "DELETE", "PUT"]);
 export const parameterTypes = pgEnum("parameter_types", ["STRING", "NUMBER", "BOOLEAN", "OBJECT"]);
 export const parameterLocations = pgEnum("parameter_locations", ["QUERY", "BODY", "HEADER"]);
+export const userRoles = pgEnum("user_roles", ["ADMIN", "MOD", "USER"]);
