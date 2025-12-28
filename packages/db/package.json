@@ -3,6 +3,9 @@
   "exports": {
     "./client": "./index.ts"
   },
+  "scripts": {
+    "drizzle": "drizzle-kit"
+  },
   "module": "index.ts",
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

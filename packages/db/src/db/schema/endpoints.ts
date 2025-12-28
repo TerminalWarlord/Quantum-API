@@ -1,4 +1,4 @@
-import { integer, pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, varchar, timestamp, unique } from "drizzle-orm/pg-core";
 import { apiTable } from "./apis";
 import { endpointMethods } from "./enums";
 
@@ -13,4 +13,11 @@ export const endpointTable = pgTable("endpoints", {
     method: endpointMethods().default("GET"),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow(),
-})
+}, (t) => [
+    unique("endpoints_api_path_method_unique").on(
+        t.api_id,
+        t.path,
+        t.method
+    )
+])
+
