@@ -10,3 +10,4 @@ export const endpointMethods = pgEnum("endpoint_methods", ["GET", "POST", "PATCH
 export const parameterTypes = pgEnum("parameter_types", ["STRING", "NUMBER", "BOOLEAN", "OBJECT"]);
 export const parameterLocations = pgEnum("parameter_locations", ["QUERY", "BODY", "HEADER"]);
 export const userRoles = pgEnum("user_roles", ["ADMIN", "MOD", "USER"]);
+export const reviewStatus = pgEnum("review_status", ["PENDING", "PUBLISHED", "DELETED"]);
