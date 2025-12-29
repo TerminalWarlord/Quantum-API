@@ -1,4 +1,3 @@
-
 export function makeUsageKeys(subscription_id: number, metric: string) {
     const date = new Date();
     const YYYY = date.getUTCFullYear();
