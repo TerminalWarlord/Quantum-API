@@ -11,7 +11,12 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@dodopayments/nextjs": "^0.3.1",
+    "@paddle/paddle-js": "^1.6.1",
     "@repo/ui": "*",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.5.3",
+    "dodopayments-checkout": "^1.3.2",
     "next": "^16.0.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
