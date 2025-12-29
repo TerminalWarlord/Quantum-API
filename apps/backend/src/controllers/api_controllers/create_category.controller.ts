@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { createSlug } from "../../lib/create_slug";
-import { db, userTable } from "@repo/db/client";
+import { createSlug, tableEnum } from "../../lib/create_slug";
+import { categoriesTable, db, userTable } from "@repo/db/client";
 import { CustomContext } from "../../middlewares/middleware";
 import { eq } from "drizzle-orm";
 
@@ -30,9 +30,18 @@ export const postCreateCategory = async (c: CustomContext) => {
             message: "Forbidden"
         }, 403);
     }
-    return c.json({
-        message: "Successful",
+    const { slug } = await createSlug(parsedData.data.name, tableEnum.CATEGORIES);
+    const [category] = await db.insert(categoriesTable).values({
+        slug,
         name: parsedData.data.name,
-        ...await createSlug(parsedData.data.name)
-    });
+    }).returning({ id: categoriesTable.id, slug: categoriesTable.slug, name: categoriesTable.name });
+    if (!category) {
+        return c.json({
+            message: "Failed to create category"
+        }, 409);
+    }
+    return c.json({
+        message: "Successfully created category",
+        ...category
+    }, 201);
 }

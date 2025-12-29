@@ -2,6 +2,7 @@ import { db, apiTable } from "@repo/db/client";
 import * as z from "zod";
 import { CustomContext } from "../../middlewares/middleware";
 import { createProduct } from "../../lib/payment_provider_helpers/paddle";
+import { createSlug, tableEnum } from "../../lib/create_slug";
 
 export const postCreateApi = async (c: CustomContext) => {
     if (!c.token || !c.token.id) {
@@ -11,7 +12,6 @@ export const postCreateApi = async (c: CustomContext) => {
     }
     const schema = z.object({
         title: z.string().max(255).min(5),
-        slug: z.string().max(255).min(5),
         description: z.string().min(10),
         image_url: z.string().optional(),
         base_url: z.string().min(7).max(255),
@@ -23,8 +23,9 @@ export const postCreateApi = async (c: CustomContext) => {
         return c.json({
             message: "Failed to add API",
             error: parseData.error.flatten().fieldErrors
-        }, 401);
+        }, 400);
     }
+    const { slug } = await createSlug(parseData.data.title, tableEnum.APIS);
     try {
         const product_id = await createProduct({
             name: parseData.data.title,
@@ -33,24 +34,25 @@ export const postCreateApi = async (c: CustomContext) => {
         })
         const [api] = await db.insert(apiTable).values({
             ...parseData.data,
-            thumbnail_url: parseData.data.image_url,
+            slug,
             product_id,
+            thumbnail_url: parseData.data.image_url,
             developer_id: c.token?.id,
         }).returning({ id: apiTable.id });
         if (!api) {
             return c.json({
                 message: "Failed to create API",
-            }, 501);
+            }, 409);
         }
         return c.json({
             message: "API has been created",
             api_id: api.id
-        })
+        }, 201)
     }
     catch (err) {
         console.log(err);
         return c.json({
-            message: "Failed to create API"
-        }, 501);
+            message: "Internal Server Error"
+        }, 500);
     }
 }

@@ -1,34 +1,34 @@
-import { categoriesTable, db } from "@repo/db/client";
+import { db } from "@repo/db/client";
+import { sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
 
+export enum tableEnum {
+    CATEGORIES = "categories",
+    APIS = "apis",
+}
 
-export const createSlug = async (name: string) => {
+export const createSlug = async (name: string, table: tableEnum = tableEnum.CATEGORIES) => {
     let isFirstAttempt = true;
-    let slug = `${slugify(name)}`;
+    const baseSlug = `${slugify(name, {
+        lower: true,
+        replacement: '-',
+        strict: true,
+        trim: true
+    })}`;
     while (true) {
-        slug = `${slugify(name, {
-            lower: true,
-            replacement: '-',
-            strict: true,
-            trim: true
-        })}`;
-        if (!isFirstAttempt) {
-            slug += `-${nanoid(4)}`
-        }
+        const slug = isFirstAttempt ? baseSlug : `${baseSlug}-${nanoid(4)}`
         try {
-            const [row] = await db
-                .insert(categoriesTable)
-                .values({
-                    slug,
-                    name,
-                })
-                .returning({ id: categoriesTable.id, slug: categoriesTable.slug });
-            if (!row) {
-                continue;
-            }
-            return {
-                ...row
+            const result = await db.execute(sql`
+                SELECT id 
+                FROM ${sql.identifier(table)}
+                WHERE slug=${slug}
+                LIMIT 1;
+            `)
+            if (result.rowCount == 0) {
+                return {
+                    slug
+                };
             }
         }
         catch (err) {

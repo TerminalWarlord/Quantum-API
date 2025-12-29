@@ -34,7 +34,6 @@ export async function createProduct(
 
     });
     const resData = await res.json();
-    console.log(resData);
     return resData.data.id;
 }
 
