@@ -36,14 +36,13 @@ export const proxyController = async (c: Context) => {
             a.base_url,
             p.monthly_requests,
             p.rate_limit,
-            s.api_id,
-            s.plan_id
+            s.id AS subscription_id
         FROM api_keys AS ak
         JOIN subscriptions AS s
             ON s.id=ak.subscription_id
         JOIN apis AS a
             ON a.id=s.api_id
-        JOIN plans as p
+        JOIN plans AS p
             ON p.id=s.plan_id
         WHERE ak.key_hash=${incomingSHA256};
     `)
@@ -57,8 +56,7 @@ export const proxyController = async (c: Context) => {
         base_url: string
         monthly_requests: string
         rate_limit: string
-        api_id: number
-        plan_id: number
+        subscription_id: number
     } = results.rows[0] as any;
 
     if (info.status != "active") {
@@ -67,8 +65,7 @@ export const proxyController = async (c: Context) => {
         }, 403);
     }
     const usage = await checkAndIncrUsage({
-        api_id: info.api_id,
-        api_key: api_key,
+        subscription_id: info.subscription_id,
         metric: "requests",
         monthly_requests: Number(info.monthly_requests),
         rate_limit: Number(info.rate_limit)

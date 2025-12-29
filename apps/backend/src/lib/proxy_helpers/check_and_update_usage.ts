@@ -1,30 +1,15 @@
 import { redis } from "@repo/redis";
+import { makeUsageKeys } from "@repo/shared";
 
-
-
-function makeUsageKeys(api_id: number, api_key: string, metric: string) {
-    const date = new Date();
-    const YYYY = date.getUTCFullYear();
-    const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
-    const DD = String(date.getUTCDate()).padStart(2, "0");
-    const HH = String(date.getUTCHours()).padStart(2, "0");
-
-    return {
-        hourKey: `usage:hour:${api_id}:${api_key}:${YYYY}${MM}${DD}${HH}:${metric}`,
-        monthKey: `usage:month:${api_id}:${api_key}:${YYYY}${MM}${DD}:${metric}`
-    }
-}
-
-export const checkAndIncrUsage = async ({ monthly_requests, rate_limit, api_id, api_key, metric }:
+export const checkAndIncrUsage = async ({ monthly_requests, rate_limit, subscription_id, metric }:
     {
         monthly_requests: number,
         rate_limit: number,
-        api_id: number,
-        api_key: string,
+        subscription_id: number,
         metric: string
     }
 ) => {
-    const { hourKey, monthKey } = makeUsageKeys(api_id, api_key, metric);
+    const { hourKey, monthKey } = makeUsageKeys(subscription_id, metric);
     const hourTTL = 60 * 60 * 2;
     const monthTTL = 24 * 45 * 60 * 60;
     const maxRetries = 5;
