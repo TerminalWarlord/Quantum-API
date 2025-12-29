@@ -7,6 +7,7 @@ import paymentHookRouter from './routes/payment_hooks';
 import { getEndpoints } from './controllers/api_controllers/get_endpoints.controller';
 import { getParameters } from './controllers/api_controllers/get_parameters.controller';
 import { cors } from 'hono/cors';
+import { getReviews } from './controllers/api_controllers/get_reviews.controller';
 
 export const app = new Hono()
 
@@ -24,8 +25,9 @@ app.route('/manage', contentRouter);
 app.route('/proxy/*', proxyRouter);
 app.route('/paddle', paymentHookRouter);
 app.get('/apis', getApis);
-app.get("/get-endpoints", getEndpoints);
-app.get("/get-parameters", getParameters);
+app.get("/endpoints", getEndpoints);
+app.get("/parameters", getParameters);
+app.get("/reviews", getReviews);
 
 
 app.get('/', async (c) => {

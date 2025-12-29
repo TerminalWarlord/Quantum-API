@@ -23,14 +23,29 @@ export const getApis = async (c: Context) => {
     const { limit, offset, order_by, category_slug, order_by_field, term } = parseData.data;
     // TODO: Implement Ordering
     const apis = await db.execute(sql`
-        SELECT a.title, a.slug, a.description, c.name AS category_name, c.slug as category_slug, a.thumbnail_url, a.updated_at  FROM apis AS a
+        SELECT 
+            a.title, 
+            a.slug, 
+            a.description, 
+            c.name AS category_name, 
+            c.slug as category_slug, 
+            a.thumbnail_url, 
+            a.updated_at,
+            COUNT(r.id) AS review_count,
+            COALESCE(AVG(r.rating), 0) AS rating
+        FROM apis AS a
+        LEFT JOIN reviews AS r
+            ON r.api_id=a.id
         JOIN categories AS c
-        ON c.id=a.category_id
+            ON c.id=a.category_id
         WHERE (
             ${term ? sql`a.title ILIKE ${'%' + term + '%'}` : sql`TRUE`}
             AND 
             ${category_slug ? sql`c.slug=${category_slug}` : sql`TRUE`}
             )
+        GROUP BY
+            a.id,
+            c.id
         LIMIT ${limit + 1}
         OFFSET ${offset}
     `)

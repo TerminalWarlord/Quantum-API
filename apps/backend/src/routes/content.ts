@@ -6,6 +6,7 @@ import { postCreateCategory } from "../controllers/api_controllers/create_catego
 import { postCreateEndpoint } from "../controllers/api_controllers/create_endpoint.controller";
 import { postCreateParameter } from "../controllers/api_controllers/create_parameter.controller";
 import { postCreateApiKey } from "../controllers/api_controllers/create_api_key.controller";
+import { postCreateReview } from "../controllers/api_controllers/create_review.controller";
 
 
 
@@ -17,6 +18,7 @@ contentRouter.post('/create-category', middleware, postCreateCategory);
 contentRouter.post('/create-endpoint', middleware, postCreateEndpoint);
 contentRouter.post('/create-parameter', middleware, postCreateParameter);
 contentRouter.post('/create-api-key', middleware, postCreateApiKey);
+contentRouter.post('/create-review', middleware, postCreateReview);
 
 
 export default contentRouter;
