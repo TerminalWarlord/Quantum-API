@@ -5,8 +5,64 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765290484138,
-      "tag": "0000_plain_miss_america",
+      "when": 1766248550736,
+      "tag": "0000_giant_red_skull",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766672931919,
+      "tag": "0001_flat_lockjaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766843364036,
+      "tag": "0002_far_newton_destine",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766846268804,
+      "tag": "0003_fair_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766996766956,
+      "tag": "0004_overjoyed_hellcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767014124236,
+      "tag": "0005_mushy_adam_warlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767015118462,
+      "tag": "0006_colossal_rhodey",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1767016057437,
+      "tag": "0007_smiling_korath",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1767017883084,
+      "tag": "0008_chilly_manta",
       "breakpoints": true
     }
   ]

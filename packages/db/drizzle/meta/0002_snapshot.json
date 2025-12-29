@@ -1,6 +1,6 @@
 {
-  "id": "daeed662-9d72-4e31-86c4-77edd109e27f",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4d1ba9eb-1484-498d-8812-31f955eaf996",
+  "prevId": "db5af5cf-ae92-4781-8396-ec41dc9af209",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -366,7 +366,17 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "endpoints_api_path_method_unique": {
+          "name": "endpoints_api_path_method_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_id",
+            "path",
+            "method"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1108,6 +1118,14 @@
           "primaryKey": false,
           "notNull": true
         },
+        "role": {
+          "name": "role",
+          "type": "user_roles",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USER'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1230,6 +1248,15 @@
         "completed",
         "failed",
         "pending"
+      ]
+    },
+    "public.user_roles": {
+      "name": "user_roles",
+      "schema": "public",
+      "values": [
+        "ADMIN",
+        "MOD",
+        "USER"
       ]
     }
   },

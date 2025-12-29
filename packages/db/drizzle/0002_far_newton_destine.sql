@@ -1,0 +1,1 @@
+ALTER TABLE "endpoints" ADD CONSTRAINT "endpoints_api_path_method_unique" UNIQUE("api_id","path","method");
