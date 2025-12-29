@@ -5,6 +5,7 @@ import { middleware } from "../middlewares/middleware";
 import { postCreateCategory } from "../controllers/api_controllers/create_category.controller";
 import { postCreateEndpoint } from "../controllers/api_controllers/create_endpoint.controller";
 import { postCreateParameter } from "../controllers/api_controllers/create_parameter.controller";
+import { postCreateApiKey } from "../controllers/api_controllers/create_api_key.controller";
 
 
 
@@ -15,6 +16,7 @@ contentRouter.post('/create-api-plan', middleware, postCreatePlan);
 contentRouter.post('/create-category', middleware, postCreateCategory);
 contentRouter.post('/create-endpoint', middleware, postCreateEndpoint);
 contentRouter.post('/create-parameter', middleware, postCreateParameter);
+contentRouter.post('/create-api-key', middleware, postCreateApiKey);
 
 
 export default contentRouter;

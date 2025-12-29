@@ -80,10 +80,33 @@ export const proxyController = async (c: Context) => {
         }, 429);
     }
 
-    // TODO: forward the request to base_url
+    const url = new URL(c.req.url);
+    const targetUrl = info.base_url + url.pathname.replace('/proxy', '') + url.search;
 
-    return c.json({
-        results: "Successful"
-    })
+    try {
+        const res = await fetch(targetUrl, {
+            method: c.req.method,
+            headers: c.req.raw.headers,
+            body: ['GET', 'HEAD'].includes(c.req.method)
+                ? undefined
+                : c.req.raw.body,
+        })
+        if (!res.ok) {
+            return new Response(res.body, {
+                status: res.status,
+                headers: res.headers,
+            });
+        }
+        return res;
+    }
+    catch (err: any) {
+        console.log(err)
+        return c.json({
+            message: "Upstream connection failed",
+            error: err.code ?? "FETCH_ERROR",
+            details: err.message,
+        }, 502);
+    }
+
 
 }

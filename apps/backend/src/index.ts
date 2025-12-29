@@ -21,7 +21,7 @@ app.use(cors({
 
 app.route('/auth', authRouter);
 app.route('/manage', contentRouter);
-app.route('/host', proxyRouter);
+app.route('/proxy/*', proxyRouter);
 app.route('/paddle', paymentHookRouter);
 app.get('/apis', getApis);
 app.get("/get-endpoints", getEndpoints);
