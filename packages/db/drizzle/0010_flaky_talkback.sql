@@ -1,0 +1,1 @@
+ALTER TABLE "status_code_usage" ADD CONSTRAINT "api_subscription_period_start_period_start_status_code_unique" UNIQUE("api_id","subscription_id","period_start","period_type","status_code");

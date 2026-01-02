@@ -13,5 +13,6 @@ export * from "./src/db/schema/transactions";
 export * from "./src/db/schema/usage";
 export * from "./src/db/schema/users";
 export * from "./src/db/schema/reviews";
+export * from "./src/db/schema/status_code_usages";
 export * from "./client";
 
