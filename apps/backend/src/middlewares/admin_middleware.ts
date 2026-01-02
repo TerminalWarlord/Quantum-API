@@ -12,7 +12,7 @@ export interface CustomContext extends Context {
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
-export const middleware = bearerAuth({
+export const adminMiddleware = bearerAuth({
     async verifyToken(token, c: CustomContext) {
         if (!token) return false;
         try {
@@ -20,10 +20,10 @@ export const middleware = bearerAuth({
             if (!payload || !payload.id) {
                 return false;
             }
-            const [user] = await db.select({ id: userTable.id })
+            const [user] = await db.select({ id: userTable.id, role: userTable.role })
                 .from(userTable)
                 .where(eq(userTable.id, payload.id));
-            if (!user) {
+            if (!user || user.role !== "ADMIN") {
                 return false;
             }
             c.token = payload;
