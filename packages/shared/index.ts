@@ -1,4 +1,6 @@
-export function makeUsageKeys(subscription_id: number, metric: string) {
+import { MetricType } from "@repo/types"
+
+export function makeUsageKeys(subscription_id: number, metric: MetricType) {
     const date = new Date();
     const YYYY = date.getUTCFullYear();
     const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -7,7 +9,9 @@ export function makeUsageKeys(subscription_id: number, metric: string) {
 
     return {
         hourKey: `usage:hour:${subscription_id}:${YYYY}${MM}${DD}${HH}:${metric}`,
-        monthKey: `usage:month:${subscription_id}:${YYYY}${MM}${DD}:${metric}`
+        dayKey: `usage:day:${subscription_id}:${YYYY}${MM}${DD}${HH}:${metric}`,
+        monthKey: `usage:month:${subscription_id}:${YYYY}${MM}${DD}:${metric}`,
+        currentDate: date
     }
 }
 

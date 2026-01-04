@@ -11,3 +11,5 @@ export const parameterTypes = pgEnum("parameter_types", ["STRING", "NUMBER", "BO
 export const parameterLocations = pgEnum("parameter_locations", ["QUERY", "BODY", "HEADER"]);
 export const userRoles = pgEnum("user_roles", ["ADMIN", "MOD", "USER"]);
 export const reviewStatus = pgEnum("review_status", ["PENDING", "PUBLISHED", "DELETED"]);
+export const statusCodeUsagePeriodType = pgEnum("status_code_usage_period_type", ["hour", "day"]);
+export const apiStatus = pgEnum("api_status", ["ENABLED", "DISABLED"]);

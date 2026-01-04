@@ -1,6 +1,7 @@
 import { integer, pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 import { userTable } from "./users";
 import { categoriesTable } from "./categories";
+import { apiStatus } from "./enums";
 
 
 export const apiTable = pgTable("apis", {
@@ -17,6 +18,7 @@ export const apiTable = pgTable("apis", {
     product_id: text().notNull(),
     thumbnail_url: text(),
     base_url: text().notNull(),
+    status: apiStatus().default("ENABLED"),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow(),
 })

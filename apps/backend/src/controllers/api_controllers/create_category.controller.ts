@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { createSlug, tableEnum } from "../../lib/create_slug";
 import { categoriesTable, db, userTable } from "@repo/db/client";
-import { CustomContext } from "../../middlewares/middleware";
+import { CustomContext } from "../../middlewares/user_middleware";
 import { eq } from "drizzle-orm";
 
 export const postCreateCategory = async (c: CustomContext) => {
