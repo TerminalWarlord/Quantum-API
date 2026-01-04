@@ -26,3 +26,9 @@ export enum ParameterType {
     BOOLEAN = "BOOLEAN",
     OBJECT = "OBJECT"
 }
+
+export enum MetricType {
+    REQUESTS = "requests",
+    STATUS_CODES = "status_codes",
+}
+
