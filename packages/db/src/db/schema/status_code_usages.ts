@@ -3,7 +3,7 @@ import { subscriptionTable } from "./subscriptions";
 import { statusCodeUsagePeriodType } from "./enums";
 import { apiTable } from "./apis";
 
-export const statusCodeUsageTable = pgTable("status_code_usage", {
+export const statusCodeUsageTable = pgTable("status_code_usages", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     subscription_id: integer()
         .notNull()
