@@ -1,6 +1,6 @@
 import { db, parameterTable } from "@repo/db/client";
 import * as z from "zod";
-import { CustomContext } from "../../middlewares/middleware";
+import { CustomContext } from "../../middlewares/user_middleware";
 import { ParameterLocation, ParameterType } from "@repo/types";
 
 export const postCreateParameter = async (c: CustomContext) => {

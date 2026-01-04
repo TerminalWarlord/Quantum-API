@@ -1,6 +1,6 @@
 import { apiTable, db, planTable } from "@repo/db/client";
 import * as z from "zod";
-import { CustomContext } from "../../middlewares/middleware";
+import { CustomContext } from "../../middlewares/user_middleware";
 import { eq } from "drizzle-orm";
 import { createPrice } from "../../lib/payment_provider_helpers/paddle";
 

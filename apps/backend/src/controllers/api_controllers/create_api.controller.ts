@@ -1,6 +1,6 @@
 import { db, apiTable } from "@repo/db/client";
 import * as z from "zod";
-import { CustomContext } from "../../middlewares/middleware";
+import { CustomContext } from "../../middlewares/user_middleware";
 import { createProduct } from "../../lib/payment_provider_helpers/paddle";
 import { createSlug, tableEnum } from "../../lib/create_slug";
 

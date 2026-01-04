@@ -1,7 +1,7 @@
 import { db, endpointTable } from "@repo/db/client";
 import { EndpointMethod } from "@repo/types";
 import * as z from "zod";
-import { CustomContext } from "../../middlewares/middleware";
+import { CustomContext } from "../../middlewares/user_middleware";
 
 export const postCreateEndpoint = async (c: CustomContext) => {
     const schema = z.object({
