@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { postCreateApi } from "../controllers/api_controllers/create_api.controller";
 import { postCreatePlan } from "../controllers/api_controllers/create_plan.controller";
-import { middleware } from "../middlewares/middleware";
+import { userMiddleware } from "../middlewares/user_middleware";
 import { postCreateCategory } from "../controllers/api_controllers/create_category.controller";
 import { postCreateEndpoint } from "../controllers/api_controllers/create_endpoint.controller";
 import { postCreateParameter } from "../controllers/api_controllers/create_parameter.controller";
@@ -12,13 +12,13 @@ import { postCreateReview } from "../controllers/api_controllers/create_review.c
 
 const contentRouter = new Hono();
 
-contentRouter.post('/create-api', middleware, postCreateApi);
-contentRouter.post('/create-api-plan', middleware, postCreatePlan);
-contentRouter.post('/create-category', middleware, postCreateCategory);
-contentRouter.post('/create-endpoint', middleware, postCreateEndpoint);
-contentRouter.post('/create-parameter', middleware, postCreateParameter);
-contentRouter.post('/create-api-key', middleware, postCreateApiKey);
-contentRouter.post('/create-review', middleware, postCreateReview);
+contentRouter.post('/create-api', userMiddleware, postCreateApi);
+contentRouter.post('/create-api-plan', userMiddleware, postCreatePlan);
+contentRouter.post('/create-category', userMiddleware, postCreateCategory);
+contentRouter.post('/create-endpoint', userMiddleware, postCreateEndpoint);
+contentRouter.post('/create-parameter', userMiddleware, postCreateParameter);
+contentRouter.post('/create-api-key', userMiddleware, postCreateApiKey);
+contentRouter.post('/create-review', userMiddleware, postCreateReview);
 
 
 export default contentRouter;

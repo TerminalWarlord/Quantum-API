@@ -1,5 +1,6 @@
 import { redis } from "@repo/redis";
 import { makeUsageKeys } from "@repo/shared";
+import { MetricType } from "@repo/types";
 
 export const checkAndIncrUsage = async ({ monthly_requests, rate_limit, subscription_id, metric }:
     {
@@ -9,7 +10,7 @@ export const checkAndIncrUsage = async ({ monthly_requests, rate_limit, subscrip
         metric: string
     }
 ) => {
-    const { hourKey, monthKey } = makeUsageKeys(subscription_id, metric);
+    const { hourKey, monthKey } = makeUsageKeys(subscription_id, MetricType.REQUESTS);
     const hourTTL = 60 * 60 * 2;
     const monthTTL = 24 * 45 * 60 * 60;
     const maxRetries = 5;

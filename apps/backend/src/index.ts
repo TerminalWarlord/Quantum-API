@@ -8,6 +8,7 @@ import { getEndpoints } from './controllers/api_controllers/get_endpoints.contro
 import { getParameters } from './controllers/api_controllers/get_parameters.controller';
 import { cors } from 'hono/cors';
 import { getReviews } from './controllers/api_controllers/get_reviews.controller';
+import adminRouter from './routes/admin/admin_routes';
 
 export const app = new Hono()
 
@@ -21,6 +22,7 @@ app.use(cors({
 }));
 
 app.route('/auth', authRouter);
+app.route('/admin', adminRouter);
 app.route('/manage', contentRouter);
 app.route('/proxy/*', proxyRouter);
 app.route('/paddle', paymentHookRouter);
@@ -29,10 +31,6 @@ app.get("/endpoints", getEndpoints);
 app.get("/parameters", getParameters);
 app.get("/reviews", getReviews);
 
-
-app.get('/', async (c) => {
-  return c.text('Hello Hono!')
-})
 
 
 export default {
