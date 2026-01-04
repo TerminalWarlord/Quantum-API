@@ -3,6 +3,7 @@ import { Context } from "hono";
 import { eq, sql } from "drizzle-orm";
 import { sha256 } from "hono/utils/crypto";
 import { checkAndIncrUsage } from "../../lib/proxy_helpers/check_and_update_usage";
+import { updateStatusCodeUsage } from "../../lib/admin_helpers/update_status_code_usage";
 
 
 export const proxyController = async (c: Context) => {
@@ -36,7 +37,8 @@ export const proxyController = async (c: Context) => {
             a.base_url,
             p.monthly_requests,
             p.rate_limit,
-            s.id AS subscription_id
+            s.id AS subscription_id,
+            s.api_id
         FROM api_keys AS ak
         JOIN subscriptions AS s
             ON s.id=ak.subscription_id
@@ -56,7 +58,8 @@ export const proxyController = async (c: Context) => {
         base_url: string
         monthly_requests: string
         rate_limit: string
-        subscription_id: number
+        subscription_id: number,
+        api_id: number
     } = results.rows[0] as any;
 
     if (info.status != "active") {
@@ -72,6 +75,11 @@ export const proxyController = async (c: Context) => {
     });
 
     if (!usage.allowed) {
+        await updateStatusCodeUsage({
+            subscription_id: info.subscription_id,
+            api_id: info.api_id,
+            status_code: 429
+        });
         return c.json({
             message: "Too many requests"
         }, 429);
@@ -88,6 +96,11 @@ export const proxyController = async (c: Context) => {
                 ? undefined
                 : c.req.raw.body,
         })
+        await updateStatusCodeUsage({
+            subscription_id: info.subscription_id,
+            api_id: info.api_id,
+            status_code: res.status
+        });
         if (!res.ok) {
             return new Response(res.body, {
                 status: res.status,
@@ -98,12 +111,15 @@ export const proxyController = async (c: Context) => {
     }
     catch (err: any) {
         console.log(err)
+        await updateStatusCodeUsage({
+            subscription_id: info.subscription_id,
+            api_id: info.api_id,
+            status_code: 502
+        });
         return c.json({
             message: "Upstream connection failed",
             error: err.code ?? "FETCH_ERROR",
             details: err.message,
         }, 502);
     }
-
-
 }
