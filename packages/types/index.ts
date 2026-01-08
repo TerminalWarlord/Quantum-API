@@ -4,4 +4,5 @@ export * from "./errors";
 export * from "./core/api_types";
 export * from "./core/review";
 export * from "./core/api";
+export * from "./core/user";
 export * from "./admin_dashboard/revenue";
