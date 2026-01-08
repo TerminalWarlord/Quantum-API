@@ -1,7 +1,6 @@
-import { db, subscriptionTable, transactionTable, userTable } from "@repo/db/client";
+import { db, userTable } from "@repo/db/client";
 import { Context } from "hono";
 import * as z from "zod";
-import { eq } from "drizzle-orm";
 
 export const getAllUsers = async (c: Context) => {
     const schema = z.object({

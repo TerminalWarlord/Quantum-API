@@ -1,7 +1,6 @@
-import { apiTable, db } from "@repo/db/client";
+import { apiTable, db, eq } from "@repo/db/client";
 import { Context } from "hono";
 import * as z from "zod";
-import { eq } from "drizzle-orm";
 import { ApiStatus } from "@repo/types";
 
 export const patchUpdateApi = async (c: Context) => {

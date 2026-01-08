@@ -1,7 +1,6 @@
 import { Context } from "hono";
 import * as z from "zod";
-import { eq, sql } from "drizzle-orm";
-import { db } from "@repo/db/client";
+import { db, sql } from "@repo/db/client";
 
 export const getUserSubcriptions = async (c: Context) => {
     const schema = z.object({

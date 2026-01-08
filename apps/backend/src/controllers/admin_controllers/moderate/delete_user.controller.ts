@@ -1,7 +1,6 @@
-import { db, userTable } from "@repo/db/client";
+import { db, userTable, eq } from "@repo/db/client";
 import { Context } from "hono";
 import * as z from "zod";
-import { eq } from "drizzle-orm";
 
 export const deleteUser = async (c: Context) => {
     const schema = z.coerce.number();
