@@ -1,1 +1,0 @@
-ALTER TABLE "usages" ADD CONSTRAINT "subscription_api_key_period_type_period_start_unique" UNIQUE("subscription_id","api_key_id","period_type","period_start");

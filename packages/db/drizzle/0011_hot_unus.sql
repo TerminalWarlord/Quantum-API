@@ -1,1 +1,0 @@
-ALTER TABLE status_code_usage RENAME TO status_code_usages;

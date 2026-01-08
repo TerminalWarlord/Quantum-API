@@ -1,6 +1,6 @@
 {
-  "id": "db5af5cf-ae92-4781-8396-ec41dc9af209",
-  "prevId": "daeed662-9d72-4e31-86c4-77edd109e27f",
+  "id": "f0fb0b15-f575-4da3-b98e-bd1bc1b839db",
+  "prevId": "e09b5a37-4f54-4d74-9027-d9678d0c5090",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -158,6 +158,14 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "api_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'ENABLED'"
         },
         "created_at": {
           "name": "created_at",
@@ -328,7 +336,7 @@
         },
         "method": {
           "name": "method",
-          "type": "endpoint_methods",
+          "type": "endpoint_method",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -366,7 +374,17 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "endpoints_api_path_method_unique": {
+          "name": "endpoints_api_path_method_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_id",
+            "path",
+            "method"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -412,7 +430,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
+          "type": "payment_provider",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -544,7 +562,7 @@
         },
         "location": {
           "name": "location",
-          "type": "parameter_locations",
+          "type": "parameter_location",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -556,12 +574,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "default_value": {
           "name": "default_value",
           "type": "text",
@@ -570,7 +582,7 @@
         },
         "type": {
           "name": "type",
-          "type": "parameter_types",
+          "type": "parameter_type",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -701,6 +713,239 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.reviews": {
+      "name": "reviews",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "reviews_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "api_id": {
+          "name": "api_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reviewer_id": {
+          "name": "reviewer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "review_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'PUBLISHED'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reviews_api_id_apis_id_fk": {
+          "name": "reviews_api_id_apis_id_fk",
+          "tableFrom": "reviews",
+          "tableTo": "apis",
+          "columnsFrom": [
+            "api_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reviews_reviewer_id_users_id_fk": {
+          "name": "reviews_reviewer_id_users_id_fk",
+          "tableFrom": "reviews",
+          "tableTo": "users",
+          "columnsFrom": [
+            "reviewer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "api_user_unique": {
+          "name": "api_user_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_id",
+            "reviewer_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.status_code_usages": {
+      "name": "status_code_usages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "status_code_usages_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "subscription_id": {
+          "name": "subscription_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "api_id": {
+          "name": "api_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "period_start": {
+          "name": "period_start",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "period_type": {
+          "name": "period_type",
+          "type": "status_code_usage_period_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'day'"
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_code": {
+          "name": "status_code",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "status_code_usages_subscription_id_subscriptions_id_fk": {
+          "name": "status_code_usages_subscription_id_subscriptions_id_fk",
+          "tableFrom": "status_code_usages",
+          "tableTo": "subscriptions",
+          "columnsFrom": [
+            "subscription_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "status_code_usages_api_id_apis_id_fk": {
+          "name": "status_code_usages_api_id_apis_id_fk",
+          "tableFrom": "status_code_usages",
+          "tableTo": "apis",
+          "columnsFrom": [
+            "api_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "api_subscription_period_start_period_start_status_code_unique": {
+          "name": "api_subscription_period_start_period_start_status_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_id",
+            "subscription_id",
+            "period_start",
+            "period_type",
+            "status_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.subscriptions": {
       "name": "subscriptions",
       "schema": "",
@@ -742,7 +987,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
+          "type": "payment_provider",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -880,7 +1125,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
+          "type": "payment_provider",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -979,12 +1224,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "api_key_id": {
-          "name": "api_key_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "period_type": {
           "name": "period_type",
           "type": "period_type",
@@ -1036,23 +1275,20 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        },
-        "usages_api_key_id_api_keys_id_fk": {
-          "name": "usages_api_key_id_api_keys_id_fk",
-          "tableFrom": "usages",
-          "tableTo": "api_keys",
-          "columnsFrom": [
-            "api_key_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "subscription_period_type_period_start_unique": {
+          "name": "subscription_period_type_period_start_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "subscription_id",
+            "period_type",
+            "period_start"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1088,16 +1324,10 @@
           "name": "last_name",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "username": {
           "name": "username",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -1107,6 +1337,32 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "auth_provider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'credentials'"
+        },
+        "provider_account_id": {
+          "name": "provider_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "role": {
           "name": "role",
@@ -1118,14 +1374,14 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
@@ -1148,6 +1404,14 @@
           "columns": [
             "email"
           ]
+        },
+        "provider_provider_id_unique": {
+          "name": "provider_provider_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "provider",
+            "provider_account_id"
+          ]
         }
       },
       "policies": {},
@@ -1164,8 +1428,25 @@
         "revoked"
       ]
     },
-    "public.endpoint_methods": {
-      "name": "endpoint_methods",
+    "public.api_status": {
+      "name": "api_status",
+      "schema": "public",
+      "values": [
+        "ENABLED",
+        "DISABLED"
+      ]
+    },
+    "public.auth_provider": {
+      "name": "auth_provider",
+      "schema": "public",
+      "values": [
+        "google",
+        "github",
+        "credentials"
+      ]
+    },
+    "public.endpoint_method": {
+      "name": "endpoint_method",
       "schema": "public",
       "values": [
         "GET",
@@ -1184,8 +1465,8 @@
         "void"
       ]
     },
-    "public.parameter_locations": {
-      "name": "parameter_locations",
+    "public.parameter_location": {
+      "name": "parameter_location",
       "schema": "public",
       "values": [
         "QUERY",
@@ -1193,8 +1474,8 @@
         "HEADER"
       ]
     },
-    "public.parameter_types": {
-      "name": "parameter_types",
+    "public.parameter_type": {
+      "name": "parameter_type",
       "schema": "public",
       "values": [
         "STRING",
@@ -1211,13 +1492,30 @@
         "month"
       ]
     },
-    "public.provider": {
-      "name": "provider",
+    "public.payment_provider": {
+      "name": "payment_provider",
       "schema": "public",
       "values": [
         "paddle",
         "dodo",
         "crypto"
+      ]
+    },
+    "public.review_status": {
+      "name": "review_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "PUBLISHED",
+        "DELETED"
+      ]
+    },
+    "public.status_code_usage_period_type": {
+      "name": "status_code_usage_period_type",
+      "schema": "public",
+      "values": [
+        "hour",
+        "day"
       ]
     },
     "public.subscription_status": {
@@ -1247,6 +1545,14 @@
         "ADMIN",
         "MOD",
         "USER"
+      ]
+    },
+    "public.user_status": {
+      "name": "user_status",
+      "schema": "public",
+      "values": [
+        "BANNED",
+        "ACTIVE"
       ]
     }
   },
