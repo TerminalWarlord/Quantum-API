@@ -9,7 +9,6 @@ export const registerController = async (c: Context) => {
     const schema = z.object({
         first_name: z.string().max(255),
         last_name: z.string().max(255),
-        username: z.string().max(20),
         email: z.email(),
         password: z.string().max(32)
     })
@@ -24,25 +23,29 @@ export const registerController = async (c: Context) => {
             algorithm: 'bcrypt',
             cost: 5
         });
-        const [user] = await db.insert(userTable).values({
-            email: parsedData.data.email,
-            first_name: parsedData.data.first_name,
-            last_name: parsedData.data.last_name,
-            password: hashed,
-            username: parsedData.data.username
-        }).returning();
-        if (!user) {
+        try {
+            // TODO: generate username
+            const [user] = await db.insert(userTable).values({
+                email: parsedData.data.email,
+                first_name: parsedData.data.first_name,
+                last_name: parsedData.data.last_name,
+                password: hashed,
+                username: parsedData.data.email,
+                provider: "credentials",
+            }).returning();
+            return c.json({
+                message: "User has been created",
+                user_id: user.id
+            }, 201);
+        }
+        catch (err) {
             return c.json({
                 message: "Failed to create user"
-            }, 500);
+            }, 409);
         }
-
-        return c.json({
-            message: "User has been created",
-            user_id: user.id
-        }, 201);
     }
     catch (err) {
+        console.error(err);
         return c.json({
             message: "Internal Server Error!"
         }, 500)
