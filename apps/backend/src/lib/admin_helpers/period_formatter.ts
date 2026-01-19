@@ -16,7 +16,7 @@ export function formatTimeseriesData(
         case RevenuePeriod.DAY:
             return period.toISOString().slice(0, 10);
         case RevenuePeriod.HOUR:
-            return period.getUTCHours().toString();
+            return period.getUTCHours().toString()+":00";
         default:
             return period.toISOString();
     }
