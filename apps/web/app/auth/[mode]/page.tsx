@@ -1,4 +1,4 @@
-import { AuthForm } from "@/components/auth-form"
+import { AuthForm } from "@/components/auth_form"
 
 export default async function Page({ params }: { params: Promise<{ mode: string }> }) {
   const mode = (await params).mode;

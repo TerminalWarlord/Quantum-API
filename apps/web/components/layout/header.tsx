@@ -2,28 +2,32 @@
 
 import { IconBolt } from "@tabler/icons-react"
 import { Button } from "../ui/button"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "../ui/menubar";
 import Link from "next/link";
 import { ModeToggle } from "../ui/toggle-theme";
+import HamburgerMenu from "../ui/hamburger";
 
 export const Header = () => {
     const session = useSession();
     const isAuthenticated = session.status === "authenticated";
-    return <header className="w-full bg-stone-50/60 h-14 backdrop-blur-sm sticky top-0 border-b border-stone-200 dark:bg-stone-950 dark:border-stone-800">
+    return <header className="w-full z-1000 bg-linear-to-br from-cyan-100/60 to-stone-50/50 h-14 backdrop-blur-sm sticky top-0 border-b border-stone-200 dark:from-cyan-950/50 dark:to-cyan-950/5 dark:border-stone-800">
         <nav className="flex items-center h-full px-6 justify-between">
             <div className="flex items-center space-x-4">
                 <Link href="/" className="flex gap-x-2">
                     <div className="p-1 bg-linear-to-br from-cyan-400 to-cyan-400/50 rounded-md">
                         <IconBolt className="text-stone-50" />
                     </div>
-                    <h1 className="font-medium text-xl">QuantumAPI</h1>
+                    <h1 className="font-medium text-lg md:text-xl transition-all duration-300 ease-in-out">QuantumAPI</h1>
                 </Link>
-                <Link href="/browse" className="text-stone-500 text-sm dark:text-stone-100">Browse APIs</Link>
-                <Link href="/contact" className="text-stone-500 text-sm dark:text-stone-100">Contact</Link>
+                <Link href="/browse" className="text-stone-500 text-sm dark:text-stone-100 hidden md:inline">Browse APIs</Link>
+                <Link href="/contact" className="text-stone-500 text-sm dark:text-stone-100 hidden md:inline">Contact</Link>
             </div>
-            <div className="flex space-x-2">
+            <div className="md:hidden">
+                <HamburgerMenu />
+            </div>
+            <div className="hidden md:flex space-x-2">
                 <ModeToggle />
                 {isAuthenticated ?
                     <>
@@ -45,6 +49,14 @@ export const Header = () => {
                                     <MenubarItem>
                                         Subscriptions
                                     </MenubarItem>
+                                    <MenubarItem>
+                                        <button
+                                            onClick={() => signOut({
+                                                callbackUrl: '/auth/login'
+                                            })}>
+                                            Logout
+                                        </button>
+                                    </MenubarItem>
 
                                 </MenubarContent>
                             </MenubarMenu>
@@ -54,8 +66,16 @@ export const Header = () => {
 
                     </> :
                     <>
-                        <Button variant={'outline'}>Login</Button>
-                        <Button>Sign Up</Button>
+                        <Button variant={'outline'}>
+                            <Link href={'/auth/login'}>
+                                Login
+                            </Link>
+                        </Button>
+                        <Button>
+                            <Link href={'/auth/register'}>
+                                Sign Up
+                            </Link>
+                        </Button>
                     </>
                 }
 

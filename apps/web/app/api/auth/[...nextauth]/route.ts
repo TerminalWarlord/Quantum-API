@@ -2,22 +2,24 @@ import { db, userTable, eq, and, sql, or } from "@repo/db/client";
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { AccountProvider, User } from "@repo/types";
+import { AccountProvider, User, UserRole } from "@repo/types";
 import { verifyPassword } from "@repo/shared/password_helper";
 
 declare module "next-auth" {
     interface Session extends DefaultSession {
         user: DefaultSession["user"] & {
-            id: number,
-            username: string,
+            id: number;
+            username: string;
+            role?: UserRole;
         }
     }
 
     interface User {
-        id: number,
-        username: string,
-        email: string,
-        image?: string,
+        id: number;
+        username: string;
+        email: string;
+        image?: string;
+        role?: UserRole;
     }
 }
 
@@ -85,7 +87,7 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user, trigger }) {
             if (trigger === "signIn" && user) {
-                console.log("JWT", user);
+                // console.log("JWT", user);
                 token.id = user.id as number;
                 token.username = user.username;
             }
@@ -121,7 +123,7 @@ export const authOptions: NextAuthOptions = {
                 if (existingUser) {
                     user.id = existingUser.id
                     user.username = existingUser.username
-                    console.log("SETTING up ID", existingUser.id)
+                    // console.log("SETTING up ID", existingUser.id)
                     return true;
                 }
                 const name = profile?.name;
@@ -144,10 +146,11 @@ export const authOptions: NextAuthOptions = {
                 }
                 user.id = newUser.id
                 user.username = newUser.username
+                user.role = newUser.role as UserRole
                 return true;
             }
             catch (err) {
-                console.log(err);
+                // console.log(err);
                 return false;
             }
         },
