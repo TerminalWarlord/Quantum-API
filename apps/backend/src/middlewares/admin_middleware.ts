@@ -1,8 +1,6 @@
-import { Context } from "hono";
-import { bearerAuth } from "hono/bearer-auth";
+import { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
-import { db, userTable } from "@repo/db/client"
-import { eq } from "drizzle-orm";
+import { db, sql } from "@repo/db/client"
 
 export interface CustomContext extends Context {
     token?: {
@@ -12,26 +10,46 @@ export interface CustomContext extends Context {
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
-export const adminMiddleware = bearerAuth({
-    async verifyToken(token, c: CustomContext) {
-        if (!token) return false;
-        try {
-            const payload = jwt.verify(token, JWT_SECRET) as { id: number };
-            if (!payload || !payload.id) {
-                return false;
-            }
-            const [user] = await db.select({ id: userTable.id, role: userTable.role })
-                .from(userTable)
-                .where(eq(userTable.id, payload.id));
-            if (!user || user.role !== "ADMIN") {
-                return false;
-            }
-            c.token = payload;
-            return true;
+export const adminMiddleware = async (c: CustomContext, next: Next) => {
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return c.json({
+            message: "Missing bearer token",
+        }, 401);
+    }
+    const token = authHeader.replace("Bearer ", "");
+    if (!token) {
+        return c.json({
+            message: "Missing bearer token",
+        }, 401);
+    }
+    try {
+        const payload = jwt.verify(token, JWT_SECRET) as { id: number };
+        if (!payload || !payload.id) {
+            return c.json({
+                message: "Invalid valid token!",
+            }, 401);
         }
-        catch (err) {
-            console.log(token);
+        const users = await db.execute(sql`
+            SELECT
+                id,
+                role
+            FROM
+                users
+            WHERE ${payload.id}=id
+            LIMIT 1;
+        `)
+        if (!users || !users.rowCount || users.rows[0].role !== "ADMIN") {
+            return c.json({
+                message: "Unauthorized!",
+            }, 401);
         }
-        return false;
-    },
-})
+        c.token = payload;
+        await next();
+    }
+    catch (err) {
+        return c.json({
+            message: "Invalid valid token!",
+        }, 401);
+    }
+}

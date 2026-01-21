@@ -15,4 +15,5 @@ export * from "./src/db/schema/users";
 export * from "./src/db/schema/reviews";
 export * from "./src/db/schema/status_code_usages";
 export * from "./client";
+export * from "drizzle-orm";
 

@@ -7,7 +7,7 @@ const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || "sandbox";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!;
 
 
-export default function CheckoutPage({ priceId }: { priceId: string }) {
+export default function CheckoutPage({ priceId, authToken }: { priceId: string, authToken: string }) {
     const [paddle, setPaddle] = useState<Paddle | undefined>();
     const [loading, setLoading] = useState(true);
 
@@ -41,10 +41,10 @@ export default function CheckoutPage({ priceId }: { priceId: string }) {
 
     const openCheckout = () => {
         if (!paddle) return;
-        const jwtToken = localStorage.getItem("token");
-        if(!jwtToken){
-            return;
-        }
+        // const jwtToken = localStorage.getItem("token");
+        // if (!jwtToken) {
+        //     return;
+        // }
 
         paddle.Checkout.open({
             items: [
@@ -58,7 +58,7 @@ export default function CheckoutPage({ priceId }: { priceId: string }) {
                 successUrl: `${window.location.origin}/checkout/success`,
             },
             customData: {
-                user_id: jwtToken
+                user_id: authToken
             }
         });
     };

@@ -1,3 +1,5 @@
+import { Api } from "./api"
+
 export enum ReviewStatus {
     PENDING = "PENDING",
     PUBLISHED = "PUBLISHED",
@@ -13,3 +15,5 @@ export interface Review {
     status: ReviewStatus,
     created_at?: Date
 }
+
+export type ReviewResponse = Pick<Review, "id" | "content" | "api_id" | "created_at" | "rating" | "status"> & Pick<Api, "slug" | "title"> & { name: string, user_id: number, username: string, image: string }

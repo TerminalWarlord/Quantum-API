@@ -1,14 +1,11 @@
-import Image, { type ImageProps } from "next/image";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
-type Props = Omit<ImageProps, "src"> & {
-  srcLight: string;
-  srcDark: string;
-};
-
-
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
   return (
     <div>
+      {JSON.stringify(session?.user)}
     </div>
   );
 }

@@ -1,18 +1,23 @@
-import { db, reviewTable, userTable } from "@repo/db/client";
+import { ReviewResponse } from "@/packages/types";
+import { db, reviewTable, userTable, sql } from "@repo/db/client";
 import { Context } from "hono";
 import * as z from "zod";
-import { eq, asc, desc, and } from "drizzle-orm";
 
 const orderByMap = {
-    created_at: reviewTable.created_at,
-    rating: reviewTable.rating
-}
+    created_at: sql`r.created_at`,
+    rating: sql`r.rating`
+} as const;
+
+const orderMap = {
+    ASC: sql`ASC`,
+    DESC: sql`DESC`,
+} as const;
 
 export const getReviews = async (c: Context) => {
     const schema = z.object({
-        api_id: z.coerce.number(),
+        api_id: z.coerce.number().optional(),
         sort_by: z.enum(["created_at", "rating"]).default("created_at"),
-        order: z.enum(["asc", "desc"]).default("asc"),
+        order: z.enum(["ASC", "DESC"]).default("ASC"),
         limit: z.coerce.number().min(1).max(20).default(10),
         offset: z.coerce.number().min(0).default(0),
     });
@@ -29,37 +34,48 @@ export const getReviews = async (c: Context) => {
         }, 400);
     }
     try {
-        const column = orderByMap[parsedData.data.sort_by];
-        const reviews = await db.select({
-            id: reviewTable.id,
-            content: reviewTable.content,
-            user_id: userTable.id,
-            first_name: userTable.first_name,
-            posted_at: reviewTable.created_at,
-            rating: reviewTable.rating
-        })
-            .from(reviewTable)
-            .fullJoin(userTable, eq(reviewTable.reviewer_id, userTable.id))
-            .where(and(
-                eq(reviewTable.api_id, parsedData.data.api_id),
-                eq(reviewTable.status, "PUBLISHED"),
-            ))
-            .orderBy(parsedData.data.order === "asc" ? asc(column) : desc(column))
-            .limit(parsedData.data.limit + 1)
-            .offset(parsedData.data.offset);
+        const { limit, api_id, offset, sort_by, order } = parsedData.data;
+        const column = orderByMap[sort_by];
+        const direction = orderMap[order];
+        const results = await db.execute(sql`
+            SELECT
+                r.id,
+                r.content,
+                r.rating,
+                r.api_id,
+                r.status,
+                u.id AS user_id,
+                u.username,
+                u.image,
+                a.slug,
+                a.title,
+                CONCAT_WS(' ', u.first_name, u.last_name) AS name
+            FROM reviews r
+            JOIN users u
+                ON u.id=r.reviewer_id
+            JOIN apis a
+                ON a.id=r.api_id
+            WHERE
+                ${api_id ? sql`r.api_id=${api_id}` : sql`TRUE`}
+            ORDER BY
+                ${column} ${direction}
+            LIMIT ${limit + 1}
+            OFFSET ${offset};
+        `)
 
-        if (!reviews) {
+        if (!results) {
             return c.json({
                 message: "No reviews found"
             }, 404);
         }
         return c.json({
-            results: reviews.slice(0, parsedData.data.limit),
-            hasNextPage: reviews.length > parsedData.data.limit
+            results: results.rows.slice(0, limit) as ReviewResponse[],
+            has_next_page: (results.rowCount ?? 0) > limit
         });
 
     }
     catch (err) {
+        console.log(err)
         return c.json({
             message: "Internal Server Error"
         }, 500);

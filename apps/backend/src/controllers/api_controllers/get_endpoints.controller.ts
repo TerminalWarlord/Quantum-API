@@ -1,7 +1,7 @@
 import { Context } from "hono";
-import { eq } from "drizzle-orm";
-import { db, endpointTable } from "@repo/db/client";
+import { db, endpointTable, eq, sql } from "@repo/db/client";
 import * as z from "zod";
+import { Endpoint } from "@/packages/types/core/endpoint";
 
 export const getEndpoints = async (c: Context) => {
     const schema = z.object({
@@ -19,18 +19,24 @@ export const getEndpoints = async (c: Context) => {
     console.log(parsedData.data)
 
     try {
-        const endpoints = await db
-            .select()
-            .from(endpointTable)
-            .where(eq(endpointTable.api_id, parsedData.data.api_id));
-
-        if (!endpoints) {
+        const { api_id } = parsedData.data;
+        // const endpoints = await db
+        //     .select()
+        //     .from(endpointTable)
+        //     .where(eq(endpointTable.api_id, api_id));
+        const results = await db.execute(sql`
+            SELECT
+                *
+            FROM endpoints
+            WHERE api_id=${api_id};
+        `)
+        if (!results) {
             return c.json({
                 message: "Not found"
             }, 404);
         }
         return c.json({
-            result: endpoints
+            results: results.rows as unknown as Endpoint[]
         });
     }
     catch (err) {
