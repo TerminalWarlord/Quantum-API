@@ -4,6 +4,7 @@ import { getOverview } from "../../controllers/admin_controllers/dashboard/get_o
 import { getOverviewRevenue } from "../../controllers/admin_controllers/dashboard/get_revenue.controller";
 import { getOverviewUsage } from "../../controllers/admin_controllers/dashboard/get_usage.controller";
 import { getOverviewAllRequests, getOverviewFailedRequests } from "../../controllers/admin_controllers/dashboard/get_failed_requests.controller";
+import { getAllApis } from "../../controllers/admin_controllers/dashboard/get_all_apis.controller";
 
 
 const adminOverviewRouter = new Hono();
@@ -13,6 +14,7 @@ adminOverviewRouter.get("/usage", adminMiddleware, getOverviewUsage);
 adminOverviewRouter.get("/failed-requests", adminMiddleware, getOverviewFailedRequests);
 adminOverviewRouter.get("/requests", adminMiddleware, getOverviewAllRequests);
 adminOverviewRouter.get("/", adminMiddleware, getOverview);
+adminOverviewRouter.get("/apis", adminMiddleware, getAllApis);
 
 
 

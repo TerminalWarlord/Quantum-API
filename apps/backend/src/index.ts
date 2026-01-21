@@ -9,6 +9,9 @@ import { getParameters } from './controllers/api_controllers/get_parameters.cont
 import { cors } from 'hono/cors';
 import { getReviews } from './controllers/api_controllers/get_reviews.controller';
 import adminRouter from './routes/admin/admin_routes';
+import { getCategories } from './controllers/api_controllers/get_categories.controller';
+import { getApiDetails } from './controllers/api_controllers/get_api_details.controller';
+import { getPlans } from './controllers/api_controllers/get_plans.controller';
 
 export const app = new Hono()
 
@@ -30,6 +33,9 @@ app.get('/apis', getApis);
 app.get("/endpoints", getEndpoints);
 app.get("/parameters", getParameters);
 app.get("/reviews", getReviews);
+app.get("/categories", getCategories);
+app.get("/api-details", getApiDetails);
+app.get("/plans", getPlans);
 
 
 
