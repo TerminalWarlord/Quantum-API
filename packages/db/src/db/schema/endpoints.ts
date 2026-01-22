@@ -10,6 +10,7 @@ export const endpointTable = pgTable("endpoints", {
     path: text(),
     title: varchar({ length: 255 }).notNull(),
     description: text().notNull(),
+    sample_response: text(),
     method: endpointMethods().default("GET"),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow(),

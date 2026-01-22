@@ -15,6 +15,13 @@
       "when": 1767692541040,
       "tag": "0001_third_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769088133427,
+      "tag": "0002_gray_jigsaw",
+      "breakpoints": true
     }
   ]
 }
