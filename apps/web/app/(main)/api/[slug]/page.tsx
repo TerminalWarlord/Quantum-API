@@ -37,7 +37,7 @@ export default async function Page({
                     <h1 className="tracking-tight font-bold text-xl">{api.title}</h1>
                     <Link
                         className="w-fit text-xs text-stone-700 dark:text-stone-200 tracking-tighter bg-stone-300/60 dark:bg-stone-700/60 px-1.5 py-0.5 rounded-md"
-                        href={`/?category_slug=${api.category_slug}`}
+                        href={`/browse?category_slug=${api.category_slug}`}
                     >
                         {api.category_name}
                     </Link>

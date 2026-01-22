@@ -20,6 +20,7 @@ declare module "next-auth" {
         email: string;
         image?: string;
         role?: UserRole;
+        first_name?: string;
     }
 }
 
@@ -90,6 +91,8 @@ export const authOptions: NextAuthOptions = {
                 // console.log("JWT", user);
                 token.id = user.id as number;
                 token.username = user.username;
+                token.name = user.first_name;
+                token.role = user.role;
             }
 
             return token;
@@ -99,6 +102,8 @@ export const authOptions: NextAuthOptions = {
             if (token.id) {
                 session.user.id = token.id as number;
                 session.user.username = token.username as string;
+                session.user.role = token.role as UserRole;
+                session.user.name = token.name;
             }
 
             return session;
@@ -121,8 +126,10 @@ export const authOptions: NextAuthOptions = {
                         and(eq(userTable.provider, provider), eq(userTable.provider_account_id, providerAccountId))
                     ).limit(1);
                 if (existingUser) {
-                    user.id = existingUser.id
-                    user.username = existingUser.username
+                    user.id = existingUser.id;
+                    user.username = existingUser.username;
+                    user.role = existingUser.role as UserRole;
+                    user.name = existingUser.first_name;
                     // console.log("SETTING up ID", existingUser.id)
                     return true;
                 }
@@ -146,6 +153,7 @@ export const authOptions: NextAuthOptions = {
                 }
                 user.id = newUser.id
                 user.username = newUser.username
+                user.name = newUser.first_name
                 user.role = newUser.role as UserRole
                 return true;
             }

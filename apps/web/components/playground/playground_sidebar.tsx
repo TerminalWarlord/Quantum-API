@@ -1,36 +1,61 @@
 "use client";
 
-import React from 'react'
-import { SheetContent, SheetTitle } from '../ui/sheet'
-import { Endpoint } from '@/app/(main)/api/[slug]/playground/page'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { BACKEND_URL } from '@/lib/config';
 
-const PlaygroundSidebar = ({ endpoints }: { endpoints: Endpoint[] }) => {
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { EndpointResponse } from "@repo/types"
+import { usePathname, useSearchParams } from "next/navigation";
+
+
+
+export const METHOD_COLORS = {
+    GET: "text-green-500 border-green-500 rounded px-1 border-[0.7px] bg-green-500/5",
+    POST: "text-orange-500 border-orange-500 rounded px-1 border-[0.7px] bg-orange-500/5",
+    PATCH: "text-purple-500 border-purple-500 rounded px-1 border-[0.7px] bg-purple-500/5",
+    PUT: "text-blue-500 border-blue-500 rounded px-1 border-[0.7px] bg-blue-500/5",
+    DELETE: "text-red-500 border-red-500 rounded px-1 border-[0.7px] bg-red-500/5",
+};
+
+export function PlaygroundSidebar({ endpoints }: { endpoints: EndpointResponse[] }) {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const path = usePathname();
-
+    const activeEndpoint = searchParams.get('endpoint_id');
     return (
-        <SheetContent className='p-2'>
-            <SheetTitle>Endpoints</SheetTitle>
-            <div className='flex flex-col items-start justify-center'>
-                {endpoints.map(endpoint => {
-                    return <div key={endpoint.slug} className='flex space-x-2 items-center hover:bg-cyan-200/40 w-full px-2 py-0.5 rounded-md cursor-pointer' onClick={() => {
-                        const params = new URLSearchParams(searchParams.toString());
-                        params.set('endpoint_id', endpoint.endpoint_id.toString());
-                        router.push(`${path}/?${params.toString()}`);
-                    }}>
-                        <p className='text-xs tracking-tighter text-green-500'>{endpoint.method}</p>
-                        <p className='text-sm text-stone-700'>{endpoint.path}</p>
-                    </div>
-
-                })}
-            </div>
-
-        </SheetContent>
-
+        <Sidebar className="">
+            <SidebarContent className="pt-14">
+                <SidebarGroup>
+                    <SidebarGroupLabel>Playground</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {endpoints.map((endpoint) => {
+                                const params = new URLSearchParams(searchParams.toString());
+                                params.set("endpoint_id", endpoint.id.toString());
+                                const endpointUrl = `${path}/?${params.toString()}`
+                                const isActive = activeEndpoint === endpoint.id.toString();
+                                console.log(isActive, activeEndpoint);
+                                return <SidebarMenuItem key={endpoint.id} className={cn(isActive && "bg-sidebar-accent rounded-md")}>
+                                    <SidebarMenuButton asChild>
+                                        <Link href={endpointUrl}>
+                                            <p className={cn(`text-[0.6rem]`, METHOD_COLORS[endpoint.method])}>{endpoint.method}</p>
+                                            <span>{endpoint.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            })}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+        </Sidebar>
     )
 }
-
-export default PlaygroundSidebar

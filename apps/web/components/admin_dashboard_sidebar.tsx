@@ -42,7 +42,7 @@ const items = [
   },
 ]
 
-export function AppSidebar() {
+export function AdminDashboardSidebar() {
   return (
     <Sidebar className="">
       <SidebarContent className="pt-14">

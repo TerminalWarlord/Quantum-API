@@ -1,45 +1,46 @@
-import PlaygroundContent from '@/components/playground/playground_content'
-import PlaygroundSidebar from '@/components/playground/playground_sidebar'
-import { Sheet, SheetTrigger } from '@/components/ui/sheet'
-import { db, sql } from '@repo/db/client'
-import { IconLayoutSidebarLeftCollapse } from '@tabler/icons-react'
-import React from 'react'
+import { PlaygroundSidebar } from '@/components/playground/playground_sidebar'
+import PlaygroundTabs from '@/components/playground/playground_tabs'
+import { SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { BACKEND_URL } from '@/lib/config'
+import { EndpointResponse } from '@repo/types'
 
-export interface Endpoint {
-    method: string;
-    title: string;
-    description: string;
-    slug: string;
-    path: string;
-    endpoint_id: number;
+async function getEndpoints(apiSlug: string) {
+    try {
+        const res = await fetch(`${BACKEND_URL}/endpoints?api_slug=${apiSlug}`);
+        const resData = await res.json();
+        if (!res.ok) {
+            throw new Error(resData.error || resData.message || "Failed to fetch endpoints");
+        }
+        return resData.results as EndpointResponse[];
+    }
+    catch (err: any) {
+        throw new Error(err.message || "Failed to fetch endpoints");
+    }
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+    // TODO: user must subscribe before using playground
     const slug = (await params).slug;
-    const endpoints = await db.execute(sql`
-        SELECT 
-            e.method,
-            e.title,
-            e.description,
-            a.slug,
-            e.path,
-            e.id as endpoint_id
-        FROM endpoints AS e
-        JOIN apis AS a
-        ON a.id=e.api_id
-        WHERE a.slug=${slug};
-    `)
-    console.log(endpoints.rows);
+    console.log(slug);
+    const endpoints = await getEndpoints(slug);
+    console.log(endpoints);
     return (
-        <div>
-            <Sheet>
-                <SheetTrigger asChild>
-                    <IconLayoutSidebarLeftCollapse />
-                </SheetTrigger>
-                <PlaygroundSidebar endpoints={endpoints.rows as unknown as Endpoint[]} />
-                <PlaygroundContent/>
+        <div className="flex min-h-screen w-full">
+            <PlaygroundSidebar endpoints={endpoints} />
 
-            </Sheet>
+            <SidebarInset className="flex-1 min-w-0">
+                <header className="p-2">
+                    <SidebarTrigger />
+                </header>
+                {/* {JSON.stringify(endpoints)} */}
+                <div className='flex flex-col md:flex-row'>
+                    {/* <div className=''> */}
+                    <PlaygroundTabs />
+                    {/* </div> */}
+                    {/* <div className='flex-1 bg-amber-200'></div> */}
+                </div>
+
+            </SidebarInset>
         </div>
     )
 }

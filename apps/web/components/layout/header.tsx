@@ -4,7 +4,7 @@ import { IconBolt } from "@tabler/icons-react"
 import { Button } from "../ui/button"
 import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "../ui/menubar";
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from "../ui/menubar";
 import Link from "next/link";
 import { ModeToggle } from "../ui/toggle-theme";
 import HamburgerMenu from "../ui/hamburger";
@@ -33,16 +33,26 @@ export const Header = () => {
                     <>
                         <Menubar className="shadow-none border-0 bg-transparent">
                             <MenubarMenu>
-                                <MenubarTrigger className="bg-transparent">
+                                <MenubarTrigger className="shadow-none border-0 bg-transparent px-0 py-0 rounded-full">
                                     <div className="flex space-x-2 items-center">
-                                        <p className="text-xs text-stone-500 dark:text-stone-100">{session.data.user.name}</p>
                                         <Avatar>
-                                            {session.data.user.image && <AvatarImage src={session.data.user.image} alt="@shadcn" />}
-                                            <AvatarFallback>{session.data.user.name}</AvatarFallback>
+                                            {session.data?.user?.image && (
+                                                <AvatarImage
+                                                    src={session.data.user.image}
+                                                    alt={session.data.user.name ?? "User avatar"}
+                                                />
+                                            )}
+                                            <AvatarFallback>
+                                                {session.data?.user?.email ? session.data?.user?.email[0].toLocaleUpperCase() : "U"}
+                                            </AvatarFallback>
                                         </Avatar>
                                     </div>
                                 </MenubarTrigger>
                                 <MenubarContent>
+                                    <MenubarItem>
+                                        {session.data?.user?.name || session.data.user.email}
+                                    </MenubarItem>
+                                    <MenubarSeparator />
                                     <MenubarItem>
                                         Dashboard
                                     </MenubarItem>
@@ -78,9 +88,6 @@ export const Header = () => {
                         </Button>
                     </>
                 }
-
-
-
             </div>
         </nav>
 

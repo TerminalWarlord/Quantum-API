@@ -19,7 +19,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
 
@@ -137,6 +137,7 @@ export function AuthForm({ mode, ...props }: React.ComponentProps<typeof Card> &
 								<Button
 									disabled={isSubmitted}
 									type="submit"
+									className="bg-black text-white dark:bg-stone-600"
 								>
 									{isSubmitted && <Spinner />}
 									{mode === "login" ? "Sign in" : "Create Account"}

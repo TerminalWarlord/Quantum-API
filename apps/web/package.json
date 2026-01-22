@@ -25,6 +25,7 @@
     "@repo/shared": "workspace:*",
     "@repo/types": "workspace:*",
     "@tabler/icons-react": "^3.36.1",
+    "@uiw/react-json-view": "^2.0.0-alpha.41",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
