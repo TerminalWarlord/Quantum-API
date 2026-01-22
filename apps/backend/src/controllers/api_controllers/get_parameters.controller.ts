@@ -1,7 +1,8 @@
 import { Context } from "hono";
 import { eq } from "drizzle-orm";
-import { db, parameterTable } from "@repo/db/client";
+import { db, parameterTable, sql } from "@repo/db/client";
 import * as z from "zod";
+import { Parameter } from "@/packages/types";
 
 export const getParameters = async (c: Context) => {
     const schema = z.object({
@@ -19,18 +20,43 @@ export const getParameters = async (c: Context) => {
     console.log(parsedData.data)
 
     try {
-        const endpoints = await db
-            .select()
-            .from(parameterTable)
-            .where(eq(parameterTable.endpoint_id, parsedData.data.endpoint_id));
+        const { endpoint_id } = parsedData.data;
 
-        if (!endpoints) {
+        // const endpoints = await db
+        //     .select()
+        //     .from(parameterTable)
+        //     .where(eq(parameterTable.endpoint_id, parsedData.data.endpoint_id));
+        const paramResults = await db.execute(sql`
+            SELECT
+                id,
+                endpoint_id,
+                name,
+                location,
+                is_required,
+                default_value,
+                type
+            FROM parameters
+            WHERE endpoint_id=${parsedData.data.endpoint_id};
+        `)
+        const endpointResults = await db.execute(sql`
+            SELECT
+                path,
+                title,
+                description,
+                method,
+                sample_response
+            FROM endpoints
+            WHERE id=${endpoint_id}
+            LIMIT 1;
+        `)
+        if (!paramResults && !endpointResults) {
             return c.json({
                 message: "Not found"
             }, 404);
         }
         return c.json({
-            result: endpoints
+            ...endpointResults.rows[0],
+            results: paramResults.rows as unknown as Parameter[]
         });
     }
     catch (err) {

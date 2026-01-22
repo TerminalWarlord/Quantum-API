@@ -9,6 +9,7 @@ export const postCreateEndpoint = async (c: CustomContext) => {
         api_id: z.number(),
         path: z.string(),
         description: z.string(),
+        sample_response: z.string().optional(),
         method: z.enum(EndpointMethod).default(EndpointMethod.GET),
 
     });
@@ -21,8 +22,20 @@ export const postCreateEndpoint = async (c: CustomContext) => {
     }
 
     try {
+        if (parsedData.data.sample_response) {
+            try {
+                JSON.parse(parsedData.data.sample_response);
+            }
+            catch {
+                return c.json({
+                    message: "Invalid input!",
+                    error: "Invalid sample_response provided!"
+                }, 400);
+            }
+        }
         const [endpoint] = await db.insert(endpointTable).values({
-            ...parsedData.data
+            ...parsedData.data,
+            sample_response: parsedData.data.sample_response ? JSON.stringify(parsedData.data.sample_response, null, 2) : null
         }).returning({ id: endpointTable.id });
         if (!endpoint) {
             return c.json({
