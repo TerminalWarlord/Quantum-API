@@ -6,6 +6,7 @@ export * from "./core/review";
 export * from "./core/api";
 export * from "./core/user";
 export * from "./core/plan";
+export * from "./core/endpoint";
 export * from "./admin_dashboard/revenue";
 export * from "./admin_dashboard/period";
 export * from "./admin_dashboard/overview";
