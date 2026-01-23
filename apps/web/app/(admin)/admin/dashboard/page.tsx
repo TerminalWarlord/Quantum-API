@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { Card } from "@/components/ui/card";
 import { IconActivity, IconCurrencyDollar, IconPackage, IconUsers } from "@tabler/icons-react";
 import { ChartAreaDefault } from "@/components/ui/chart_area";
-import RevenueGraph from "@/components/dashboard/revenue";
+import RevenueGraph from "@/components/admin_dashboard/revenue";
 import Unauthorized from "@/components/ui/unauthorized";
 import Dashboard_Card from "@/components/ui/dashboard_card";
 import { DashboardOverview } from "@repo/types";

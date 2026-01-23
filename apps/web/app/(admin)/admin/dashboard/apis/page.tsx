@@ -11,7 +11,7 @@ import NoResults from "@/components/ui/no_results";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import CustomSearchBar from "@/components/dashboard/custom_search";
+import CustomSearchBar from "@/components/admin_dashboard/custom_search";
 
 async function getApis({
     authToken,

@@ -1,33 +1,32 @@
 "use client";
 
 import { BACKEND_URL } from "@/lib/config";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { EndpointMethod, ParameterLocation, ParameterResponse, ParameterType } from "@repo/types"
-import { CheckCircle2, Loader2 } from "lucide-react";
-import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
-import { METHOD_COLORS } from "./playground_sidebar_old";
+import { Loader2 } from "lucide-react";
+import { METHOD_COLORS } from "./playground_sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { IconCircleCheck, IconCircleCheckFilled, IconCircleX, IconCircleXFilled, IconPlayerPlayFilled } from "@tabler/icons-react";
+import { IconBug, IconHelpHexagon, IconPlayerPlayFilled } from "@tabler/icons-react";
 import PlaygroundResponseTab from "./playground_response";
+import { useRequestStore } from "@/stores/request_store";
+import PlaygroundParams from "./playground_params";
+import PlaygroundBody from "./playground_body";
+import PlaygroundHeader from "./playground_header";
+import { useSession } from "next-auth/react";
+import { signJwt } from "@/actions/auth";
 
 
-const checkJsonValidity = (value: string) => {
-    try {
-        const val = JSON.parse(value);
-        return true;
+
+
+const fetcher = async ([url, endpointId]: [url: string, endpointId: string]) => {
+    if (!endpointId) {
+        toast.warning("Select an endpoint to use the playground");
+        return;
     }
-    catch {
-        return false;
-    }
-}
-
-const fetcher = async (url: string) => {
     try {
         const res = await fetch(url);
         const resData = await res.json();
@@ -37,121 +36,48 @@ const fetcher = async (url: string) => {
         return resData as ParameterResponse
     }
     catch (err: any) {
+        console.log(err.message)
         toast.error(err.message || "Failed to get parameters");
     }
 
 }
 export default function PlaygroundTabs() {
     const [currentTab, setCurrentTab] = useState(ParameterLocation.QUERY);
-    const [bodyInput, setBodyInput] = useState<string | null>(null);
-    const [isJsonValid, setIsJsonValid] = useState(true);
+    const session = useSession();
     const searchParams = useSearchParams();
+    const sendRequest = useRequestStore(s => s.sendRequests);
+    const selectedHeaderApiKey = useRequestStore(s => s.selectedHeaderApiKey);
     const endpointId = searchParams.get('endpoint_id');
-    const { data, isLoading, error } = useSWR(`${BACKEND_URL}/parameters?endpoint_id=${endpointId}`, fetcher);
+    const { data, isLoading, error } = useSWR([`${BACKEND_URL}/parameters?endpoint_id=${endpointId}`, endpointId], fetcher);
 
 
-    const body = data?.results?.filter(p => p.location === ParameterLocation.BODY) ?? [];
 
     useEffect(() => {
         setCurrentTab(ParameterLocation.QUERY);
-        setBodyInput(null);
-        setIsJsonValid(true);
     }, [endpointId]);
 
-    useEffect(() => {
-        if (!bodyInput && body.length > 0) {
-            try {
-                const formatted = JSON.stringify(
-                    JSON.parse(body[0].default_value),
-                    null,
-                    2
-                );
-                setIsJsonValid(checkJsonValidity(formatted));
-                setBodyInput(formatted);
-            } catch {
-                setIsJsonValid(checkJsonValidity(body[0].default_value));
-                setBodyInput(body[0].default_value);
-            }
-        }
-    }, [body, bodyInput]);
+    if (error) {
+        return <div className="text-center w-full h-7/12 flex space-y-5 flex-col items-center justify-center">
+            <IconBug className="w-15 h-15" />
+            <p className="text-xl font-medium">Failed to fetch data! </p>
+        </div>
+    }
+    if (!endpointId) {
+        return <div className="text-center w-full h-7/12 flex space-y-5 flex-col items-center justify-center">
+            <IconHelpHexagon className="w-15 h-15" />
+            <p className="text-xl font-medium">Select an endpoint to use the playground </p>
+        </div>
+    }
 
     if (isLoading) {
-        return <div className="flex items-center justify-center">
+        return <div className="flex items-center justify-center w-full  h-8/12">
             <Loader2 className="animate-spin" />
         </div>
     }
     console.log(endpointId);
     const parameters = data && data.results ? data.results.filter(d => d.location === ParameterLocation.QUERY) : [];
 
-    const bodyEditor = (
-        <div className="relative">
-            <div className="bg-muted/50 rounded-lg border overflow-hidden">
-                <div className="flex">
-                    {/* line numbers */}
-                    <div className="w-10 py-3 text-right pr-3 text-xs text-muted-foreground font-mono select-none border-r bg-muted/30">
-                        {(bodyInput ?? "{\n  \n}")
-                            .split("\n")
-                            .map((_, i) => (
-                                <div key={i}>{i + 1}</div>
-                            ))}
-                    </div>
 
-                    {/* textarea */}
-                    <textarea
-                        value={bodyInput ?? "{\n  \n}"}
-                        onChange={(e) => {
-                            setBodyInput(e.target.value);
-                            setIsJsonValid(checkJsonValidity(e.target.value));
-                        }}
-                        className="
-                        flex-1
-                        bg-transparent
-                        p-3
-                        font-mono
-                        text-sm
-                        resize-none
-                        focus:outline-none
-                        min-h-50
-                        whitespace-pre
-                        leading-relaxed
-                        "
-                        spellCheck={false}
-                    />
-                </div>
-            </div>
-
-            <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                {isJsonValid ? <>
-                    <IconCircleCheckFilled className="h-5 w-5 text-emerald-500" />
-                    Valid Body
-                </> : <>
-                    <IconCircleXFilled className="h-5 w-5 text-red-500" />
-                    Invalid Body
-                </>}
-            </div>
-        </div>
-    );
-
-    const paramComp = <div>
-        <h3 className="text-md font-semibold my-2">Parameters</h3>
-        <div className="border rounded-md">
-            {parameters && parameters.length > 0 && parameters.map((p, idx) => {
-                return <div
-                    style={{ fontFamily: "var(--font-poppins)" }}
-                    className="pb-2"
-                >
-                    <div className="px-4">
-                        <div className="flex space-x-1 items-baseline my-2 ">
-                            <p className="text-sm">{p.name}</p>
-                            {p.is_required && <p className="text-[0.6rem] bg-red-500 px-1  rounded-lg text-white mx-0.5">required</p>}
-                        </div>
-                        <Input type="text" placeholder={p.default_value} value={p.default_value} />
-                    </div>
-                    {idx !== parameters.length - 1 && <Separator className="mt-4" />}
-                </div>
-            })}
-        </div>
-    </div>
     return <div className="flex flex-col md:flex-row w-full px-4 md:px-8 space-y-8 md:space-y-0 space-x-0 md:space-x-4">
         <div className="w-full md:w-2/3 overflow-clip">
             <ul className="flex items-baseline px-0 sm:px-2 md:px-8 text-center text-black dark:text-stone-100 border-b border-t box-border">
@@ -183,18 +109,40 @@ export default function PlaygroundTabs() {
             </div>
             <h2 className="text-stone-700 dark:text-stone-300 tracking-tight mt-4 mb-8 text-sm">{data?.description}</h2>
 
-            {currentTab === ParameterLocation.QUERY && parameters.length > 0 && paramComp}
-            {currentTab === ParameterLocation.BODY && bodyInput && bodyEditor}
+            {currentTab === ParameterLocation.QUERY && parameters.length > 0 && <PlaygroundParams parameters={parameters} />}
+            {currentTab === ParameterLocation.BODY && <PlaygroundBody data={data?.results || []} />}
             {/* </div> */}
             {/* {JSON.stringify(data)} */}
-            <Button className="bg-cyan-400 hover:bg-cyan-500/95 cursor-pointer text-white my-8">
+
+            {currentTab === ParameterLocation.HEADER && <PlaygroundHeader />}
+            <Button
+                onClick={async () => {
+                    if (!data) return;
+                    if (!session || !session.data?.user.id) {
+                        toast.error("Please login to use the playground!");
+                        return;
+                    }
+
+                    const token = await signJwt({
+                        api_key_id: selectedHeaderApiKey
+                    })
+                    await sendRequest(
+                        data.path,
+                        data.method,
+                        token
+                    )
+                }}
+                className="bg-cyan-400 hover:bg-cyan-500/95 cursor-pointer text-white my-8"
+            >
                 <IconPlayerPlayFilled />
                 <p>Send Request</p>
             </Button>
         </div>
-        <PlaygroundResponseTab
-            sampleResponse={data?.sample_response}
-        />
+        <div className="h-fit">
+            <PlaygroundResponseTab
+                sampleResponse={data?.sample_response}
+            />
+        </div>
 
     </div>
 }

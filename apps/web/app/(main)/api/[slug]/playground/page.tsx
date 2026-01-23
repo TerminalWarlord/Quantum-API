@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                     <SidebarTrigger />
                 </header>
                 {/* {JSON.stringify(endpoints)} */}
-                <div className='flex flex-col md:flex-row'>
+                <div className='flex flex-col md:flex-row h-full'>
                     {/* <div className=''> */}
                     <PlaygroundTabs />
                     {/* </div> */}

@@ -137,7 +137,7 @@ export function AuthForm({ mode, ...props }: React.ComponentProps<typeof Card> &
 								<Button
 									disabled={isSubmitted}
 									type="submit"
-									className="bg-black text-white dark:bg-stone-600"
+									className="bg-black hover:bg-black/80 text-white dark:bg-stone-600 dark:hover:bg-stone-600/80"
 								>
 									{isSubmitted && <Spinner />}
 									{mode === "login" ? "Sign in" : "Create Account"}

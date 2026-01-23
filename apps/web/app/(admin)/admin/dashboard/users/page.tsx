@@ -1,5 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import CustomSearchBar from "@/components/dashboard/custom_search";
+import CustomSearchBar from "@/components/admin_dashboard/custom_search";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";

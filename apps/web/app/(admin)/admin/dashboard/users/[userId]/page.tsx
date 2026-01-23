@@ -1,5 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import RemoveUser from "@/components/dashboard/remove_user";
+import RemoveUser from "@/components/admin_dashboard/remove_user";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Card } from "@/components/ui/card";

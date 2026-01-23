@@ -1,5 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import ManageReview from "@/components/dashboard/manage_review";
+import ManageReview from "@/components/admin_dashboard/manage_review";
 import Unauthorized from "@/components/ui/unauthorized";
 import { IconStarFilled } from "@tabler/icons-react";
 import { getServerSession } from "next-auth";

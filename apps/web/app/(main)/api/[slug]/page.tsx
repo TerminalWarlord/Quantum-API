@@ -9,6 +9,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@/lib/config";
+import { headers } from "next/headers";
+
+
+
+// const getPathname = async () => {
+//     const h = await headers();
+//     return h.get("next-url") || "/";
+// }
 
 export default async function Page({
     params
@@ -18,6 +26,7 @@ export default async function Page({
     if (!slug) {
         notFound();
     }
+
     const api = await fetchApiDetails(slug);
     const session = await getServerSession(authOptions);
     const authToken = !session ? undefined : jwt.sign({ id: session.user.id }, JWT_SECRET);
@@ -55,14 +64,16 @@ export default async function Page({
                     </div>
                 </div>
             </div>
-            <Button className="bg-stone-100 border-2 dark:bg-stone-400/30 dark:text-white">Open Playground</Button>
+            <Button className="bg-stone-100 border-2 dark:bg-stone-400/30 dark:text-white">
+                <Link href={`/api/${slug}/playground`}>Open Playground</Link>
+            </Button>
 
         </div>
         <div className="my-6">
             <h2 className="text-xl font-semibold">Descriptions</h2>
             <p className="text-stone-600 tracking-tight">{api.description}</p>
         </div>
-        <Pricing api_slug={api.slug} authToken={authToken}/>
+        <Pricing api_slug={api.slug} authToken={authToken} />
     </div>
 
 }
