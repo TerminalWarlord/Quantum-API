@@ -2,12 +2,12 @@ import { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
 import { db, sql } from "@repo/db/client"
 
+
 export interface CustomContext extends Context {
     token?: {
         id: number
     }
 }
-
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
 export const userMiddleware = async (c: CustomContext, next: Next) => {

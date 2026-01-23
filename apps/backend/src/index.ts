@@ -12,6 +12,7 @@ import adminRouter from './routes/admin/admin_routes';
 import { getCategories } from './controllers/api_controllers/get_categories.controller';
 import { getApiDetails } from './controllers/api_controllers/get_api_details.controller';
 import { getPlans } from './controllers/api_controllers/get_plans.controller';
+import { playgroundProxyController } from './controllers/proxy_controllers/playground_proxy.controller';
 
 export const app = new Hono()
 
@@ -36,7 +37,7 @@ app.get("/reviews", getReviews);
 app.get("/categories", getCategories);
 app.get("/api-details", getApiDetails);
 app.get("/plans", getPlans);
-
+app.use('/playground/*', playgroundProxyController);
 
 
 export default {

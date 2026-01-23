@@ -1,16 +1,16 @@
-import { apiKeyTable, db } from "@repo/db/client";
+import { apiKeyTable, db, sql, eq } from "@repo/db/client";
 import { Context } from "hono";
-import { eq, sql } from "drizzle-orm";
 import { sha256 } from "hono/utils/crypto";
 import { checkAndIncrUsage } from "../../lib/proxy_helpers/check_and_update_usage";
 import { updateStatusCodeUsage } from "../../lib/admin_helpers/update_status_code_usage";
 
 
 export const proxyController = async (c: Context) => {
-    const host = c.req.header('X-Quantum-Host');
+    // TODO: add host
+    // const host = c.req.header('X-Quantum-Host');
     const api_key = c.req.header('X-Quantum-Key');
 
-    if (!host || !api_key) {
+    if (!api_key) {
         return c.json({
             message: "Missing api_key!"
         }, 403);
@@ -86,12 +86,24 @@ export const proxyController = async (c: Context) => {
     }
 
     const url = new URL(c.req.url);
-    const targetUrl = info.base_url + url.pathname.replace('/proxy', '') + url.search;
-
+    const incomingHeaders = new Headers(c.req.raw.headers);
+    // TODO: Undertand more about Headers
+    // This was causing some bug, sanitize the headers
+    [
+        "host",
+        "content-length",
+        "connection",
+        "accept-encoding",
+        "transfer-encoding",
+        "origin",
+        "referer",
+    ].forEach(h => incomingHeaders.delete(h));
+    const targetUrl = info.base_url + url.pathname.replace(/^\/proxy/, "") + url.search;
+    console.log(targetUrl)
     try {
         const res = await fetch(targetUrl, {
             method: c.req.method,
-            headers: c.req.raw.headers,
+            headers: incomingHeaders,
             body: ['GET', 'HEAD'].includes(c.req.method)
                 ? undefined
                 : c.req.raw.body,
@@ -101,13 +113,14 @@ export const proxyController = async (c: Context) => {
             api_id: info.api_id,
             status_code: res.status
         });
-        if (!res.ok) {
-            return new Response(res.body, {
-                status: res.status,
-                headers: res.headers,
-            });
-        }
-        return res;
+        const responseHeaders = new Headers(res.headers);
+        responseHeaders.delete("content-encoding");
+        responseHeaders.delete("content-length");
+
+        return new Response(res.body, {
+            status: res.status,
+            headers: responseHeaders,
+        });
     }
     catch (err: any) {
         console.log(err)

@@ -7,6 +7,7 @@ import { postCreateEndpoint } from "../controllers/api_controllers/create_endpoi
 import { postCreateParameter } from "../controllers/api_controllers/create_parameter.controller";
 import { postCreateApiKey } from "../controllers/api_controllers/create_api_key.controller";
 import { postCreateReview } from "../controllers/api_controllers/create_review.controller";
+import { getApiKeys } from "../controllers/api_controllers/get_api_key_id.controller";
 
 
 
@@ -19,6 +20,6 @@ contentRouter.post('/create-endpoint', userMiddleware, postCreateEndpoint);
 contentRouter.post('/create-parameter', userMiddleware, postCreateParameter);
 contentRouter.post('/create-api-key', userMiddleware, postCreateApiKey);
 contentRouter.post('/create-review', userMiddleware, postCreateReview);
-
+contentRouter.get('/keys', userMiddleware, getApiKeys);
 
 export default contentRouter;

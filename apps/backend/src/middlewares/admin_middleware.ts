@@ -1,12 +1,9 @@
-import { Context, Next } from "hono";
+import { Next } from "hono";
 import jwt from "jsonwebtoken";
 import { db, sql } from "@repo/db/client"
+import { CustomContext } from "./user_middleware";
 
-export interface CustomContext extends Context {
-    token?: {
-        id: number
-    }
-}
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
