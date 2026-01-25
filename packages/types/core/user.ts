@@ -21,7 +21,7 @@ export interface User {
     name?: string,
     username: string,
     email: string,
-    image?: string
+    image: string | null
     provider?: AccountProvider
     provider_account_id?: string,
     password?: string,
