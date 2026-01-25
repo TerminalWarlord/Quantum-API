@@ -2,7 +2,7 @@
 
 import { BACKEND_URL } from "@/lib/config";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { EndpointMethod, ParameterLocation, ParameterResponse, ParameterType } from "@repo/types"
@@ -17,7 +17,6 @@ import PlaygroundParams from "./playground_params";
 import PlaygroundBody from "./playground_body";
 import PlaygroundHeader from "./playground_header";
 import { useSession } from "next-auth/react";
-import { signJwt } from "@/actions/auth";
 
 
 
@@ -49,12 +48,19 @@ export default function PlaygroundTabs() {
     const selectedHeaderApiKey = useRequestStore(s => s.selectedHeaderApiKey);
     const endpointId = searchParams.get('endpoint_id');
     const { data, isLoading, error } = useSWR([`${BACKEND_URL}/parameters?endpoint_id=${endpointId}`, endpointId], fetcher);
-
-
+    const updateBody = useRequestStore(s => s.updateBody);
 
     useEffect(() => {
         setCurrentTab(ParameterLocation.QUERY);
     }, [endpointId]);
+
+    useEffect(() => {
+        if (!data || !data.results.length) return;
+        const body = data.results.filter(p => p.location === ParameterLocation.BODY) ?? [];
+        if (body.length) {
+            updateBody(body[0].default_value);
+        }
+    }, [data])
 
     if (error) {
         return <div className="text-center w-full h-7/12 flex space-y-5 flex-col items-center justify-center">
@@ -117,20 +123,36 @@ export default function PlaygroundTabs() {
             {currentTab === ParameterLocation.HEADER && <PlaygroundHeader />}
             <Button
                 onClick={async () => {
-                    if (!data) return;
-                    if (!session || !session.data?.user.id) {
-                        toast.error("Please login to use the playground!");
+                    try {
+                        if (!data) return;
+                        if (!session || !session.data?.user.id) {
+                            throw new Error("Please login to use the playground!");
+                        }
+                        if (!selectedHeaderApiKey) {
+                            throw new Error("You must have a subscription plan selected from the Headers tab");
+                        }
+
+                        const tokenRes = await fetch('/api/token', {
+                            method: "POST",
+                            body: JSON.stringify({
+                                api_key_id: parseInt(selectedHeaderApiKey!)
+                            })
+                        })
+                        if (!tokenRes.ok) {
+                            toast.error("Failed to generate token!");
+                            return;
+                        }
+                        const { token } = await tokenRes.json();
+                        await sendRequest(
+                            data.path,
+                            data.method,
+                            token
+                        )
+                    }
+                    catch (err: any) {
+                        toast.error(err.message || "Failed to send request!");
                         return;
                     }
-
-                    const token = await signJwt({
-                        api_key_id: selectedHeaderApiKey
-                    })
-                    await sendRequest(
-                        data.path,
-                        data.method,
-                        token
-                    )
                 }}
                 className="bg-cyan-400 hover:bg-cyan-500/95 cursor-pointer text-white my-8"
             >

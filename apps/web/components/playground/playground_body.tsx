@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const checkJsonValidity = (value: string) => {
     try {
-        const val = JSON.parse(value);
+        JSON.parse(value);
         return true;
     }
     catch {
@@ -26,7 +26,6 @@ export default function PlaygroundBody({ data }: { data: Parameter[] }) {
     const body = data.filter(p => p.location === ParameterLocation.BODY) ?? [];
 
     useEffect(() => {
-        // setBodyInput(null);
         updateBody(null);
         setIsJsonValid(true);
     }, [endpointId]);

@@ -28,6 +28,7 @@ export default function PlaygroundHeader() {
     useEffect(() => {
         const addSubscriptions = async () => {
             if (!api_slug) return;
+            // TODO: move this to next's backend
             const data = await getSubscriptions(api_slug)
             setSubscriptions(data as unknown as Subscription[]);
         }
