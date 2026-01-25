@@ -13,6 +13,8 @@ import { getCategories } from './controllers/api_controllers/get_categories.cont
 import { getApiDetails } from './controllers/api_controllers/get_api_details.controller';
 import { getPlans } from './controllers/api_controllers/get_plans.controller';
 import { playgroundProxyController } from './controllers/proxy_controllers/playground_proxy.controller';
+import uploadRouter from './routes/upload';
+import userRouter from './routes/user';
 
 export const app = new Hono()
 
@@ -30,6 +32,7 @@ app.route('/admin', adminRouter);
 app.route('/manage', contentRouter);
 app.route('/proxy/*', proxyRouter);
 app.route('/paddle', paymentHookRouter);
+app.route('/user', userRouter);
 app.get('/apis', getApis);
 app.get("/endpoints", getEndpoints);
 app.get("/parameters", getParameters);
@@ -38,7 +41,7 @@ app.get("/categories", getCategories);
 app.get("/api-details", getApiDetails);
 app.get("/plans", getPlans);
 app.use('/playground/*', playgroundProxyController);
-
+app.route('/upload', uploadRouter);
 
 export default {
   port: 3003,
