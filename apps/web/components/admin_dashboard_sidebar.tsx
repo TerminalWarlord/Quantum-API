@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { IconApi, IconStar, IconUsers } from "@tabler/icons-react"
+import { IconApi, IconClipboardText, IconStar, IconUsers } from "@tabler/icons-react"
 import Link from "next/link"
 
 // Menu items.
@@ -36,9 +36,9 @@ const items = [
     icon: IconStar,
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Pages",
+    url: "/admin/dashboard/pages",
+    icon: IconClipboardText,
   },
 ]
 

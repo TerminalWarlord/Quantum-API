@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { fetchApiDetails } from "@/lib/browse/get_api_details";
 import { IconStarFilled, IconUsers } from "@tabler/icons-react";
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "@/lib/config";
-import { headers } from "next/headers";
+import ApiReviews from "@/components/api_page/api_reviews";
+import Footer from "@/components/layout/footer";
 
 
 
@@ -29,7 +27,6 @@ export default async function Page({
 
     const api = await fetchApiDetails(slug);
     const session = await getServerSession(authOptions);
-    const authToken = !session ? undefined : jwt.sign({ id: session.user.id }, JWT_SECRET);
 
     return <div className="w-full my-8 px-8">
         <div className="flex md:flex-row md:justify-between md:items-center flex-col justify-center">
@@ -64,7 +61,7 @@ export default async function Page({
                     </div>
                 </div>
             </div>
-            <Button className="bg-stone-100 border-2 dark:bg-stone-400/30 dark:text-white">
+            <Button className="dark:border-2 dark:bg-stone-400/30 dark:text-white">
                 <Link href={`/api/${slug}/playground`}>Open Playground</Link>
             </Button>
 
@@ -73,7 +70,10 @@ export default async function Page({
             <h2 className="text-xl font-semibold">Descriptions</h2>
             <p className="text-stone-600 tracking-tight">{api.description}</p>
         </div>
-        <Pricing api_slug={api.slug} authToken={authToken} />
+        <Pricing api_slug={api.slug}/>
+
+        <ApiReviews apiSlug={slug}/>
+        <Footer/>
     </div>
 
 }

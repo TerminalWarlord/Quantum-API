@@ -14,6 +14,8 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { debouncer } from "@/lib/debouncer";
 import { submitProfileUpdateForm } from "@/lib/user_dashboard/update_profile";
+import { useRouter } from "next/navigation";
+import { createToken } from "@/lib/create_token";
 
 
 
@@ -22,6 +24,7 @@ import { submitProfileUpdateForm } from "@/lib/user_dashboard/update_profile";
 export default function EditProfile() {
     const session = useSession();
     const userData = useUserStore(s => s.user);
+    const router = useRouter();
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const updateUserData = useUserStore(s => s.updateData);
     const [isUsernameValid, setIsUsernameValid] = useState<boolean | null>(true);
@@ -31,17 +34,7 @@ export default function EditProfile() {
     useEffect(() => {
         if (!session || !session.data?.user.id) return;
         const getUser = async () => {
-            const tokenRes = await fetch('/api/token', {
-                method: "POST",
-                credentials: "include",
-                body: JSON.stringify({
-                    id: session.data.user.id
-                })
-            });
-            if (!tokenRes.ok) {
-                throw new Error("Failed to generate token");
-            }
-            const { token } = await tokenRes.json();
+            const token = await createToken(session.data)
             const res = await fetch(`${BACKEND_URL}/user/get-me`, {
                 headers: {
                     "Content-Type": "application/json",
@@ -64,18 +57,7 @@ export default function EditProfile() {
         if (!session || !session.data?.user.id) return;
         if (!usernameInputRef.current) return;
         try {
-            const tokenRes = await fetch('/api/token', {
-                method: "POST",
-                credentials: "include",
-                body: JSON.stringify({
-                    id: session.data.user.id
-                })
-            });
-            setIsUsernameValid(null);
-            if (!tokenRes.ok) {
-                throw new Error("Failed to generate token");
-            }
-            const { token } = await tokenRes.json();
+            const token = await createToken(session.data);
             const res = await fetch(`${BACKEND_URL}/user?username=${usernameInputRef.current.value}`, {
                 headers: {
                     "Authorization": "Bearer " + token
@@ -110,24 +92,30 @@ export default function EditProfile() {
             <div className="flex space-x-5 items-center">
                 <EditAvatar />
                 <div>
-                    <h3 className="text-lg font-semibold leading-5.5">Joy Biswas</h3>
+                    <h3 className="text-lg font-semibold leading-5.5">{userData?.first_name} {userData?.last_name}</h3>
                     <p className="text-stone-500 tracking-tight text-sm">{userData?.email}</p>
                 </div>
             </div>
             <Separator />
             <form className="flex flex-col" onSubmit={async (e) => {
-                await submitProfileUpdateForm(
-                    e,
-                    session.data,
-                    (status: boolean) => setIsSubmitting(status)
-                )
+                setIsSubmitting(true);
+                try {
+                    await submitProfileUpdateForm(
+                        e,
+                        session.data,
+                    );
+                    window.location.reload();
+                }
+                catch (err: any) {
+                    toast.error(err.message || "Failed to save data");
+                }
+                setIsSubmitting(false);
             }}>
                 <div className="grid grid-cols-2 gap-4">
                     <Field className="">
                         <FieldLabel htmlFor="inline-start-input">First Name</FieldLabel>
                         <InputGroup>
                             <InputGroupInput
-                                id="inline-start-input"
                                 placeholder="John"
                                 name="first_name"
                                 defaultValue={userData?.first_name}
@@ -138,7 +126,6 @@ export default function EditProfile() {
                         <FieldLabel htmlFor="inline-start-input">Last Name</FieldLabel>
                         <InputGroup>
                             <InputGroupInput
-                                id="inline-start-input"
                                 placeholder="Doe"
                                 name="last_name"
                                 defaultValue={userData?.last_name}
@@ -149,7 +136,6 @@ export default function EditProfile() {
                         <FieldLabel htmlFor="inline-start-input">Username</FieldLabel>
                         <InputGroup>
                             <InputGroupInput
-                                id="inline-start-input"
                                 placeholder="johndoe"
                                 defaultValue={userData?.username}
                                 ref={usernameInputRef}
@@ -165,8 +151,11 @@ export default function EditProfile() {
                 <Button
                     disabled={isSubmitting}
                     type="submit"
-                    className="my-4 cursor-pointer bg-black hover:bg-black/80 dark:bg-stone-700 dark:hover:bg-stone-700/80 text-white"
-                >Save</Button>
+                    className={`my-4 bg-black hover:bg-black/80 dark:bg-stone-700 dark:hover:bg-stone-700/80 text-white ${isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                    {isSubmitting && <IconLoader className="animate-spin" />}
+                    {isSubmitting ? "Saving" : "Save"}
+                </Button>
             </form>
         </Card>
     </div>

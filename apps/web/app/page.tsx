@@ -1,11 +1,9 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import Footer from "@/components/layout/footer";
+import Homepage from "@/components/pages/homepage";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
-  return (
-    <div>
-      {JSON.stringify(session?.user)}
-    </div>
-  );
+  return <>
+    <Homepage />
+    <Footer />
+  </>;
 }

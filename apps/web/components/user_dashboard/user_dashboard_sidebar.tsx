@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 import { EndpointResponse } from "@repo/types"
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Settings } from "lucide-react";
-import { IconApi, IconStar, IconUsers } from "@tabler/icons-react";
+import { IconApi, IconPlus, IconStar, IconUser, IconUsers } from "@tabler/icons-react";
 
 
 
@@ -32,7 +32,7 @@ export const METHOD_COLORS = {
 const items = [
     {
         title: "Overview",
-        url: "/admin/dashboard",
+        url: "/dashboard/overview",
         icon: Home,
     },
     {
@@ -42,25 +42,23 @@ const items = [
     },
     {
         title: "APIs",
-        url: "/admin/dashboard/apis",
+        url: "/dashboard/my-apis",
         icon: IconApi,
     },
     {
-        title: "Reviews",
-        url: "/admin/dashboard/reviews",
-        icon: IconStar,
+        title: "Add API",
+        url: "/dashboard/add-api",
+        icon: IconPlus,
     },
     {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
+        title: "Profile",
+        url: "/dashboard/profile",
+        icon: IconUser,
     },
 ]
 
 export function UserDashboardSidebar() {
-    const searchParams = useSearchParams();
     const path = usePathname();
-    const activeEndpoint = searchParams.get('endpoint_id');
     return (
         <Sidebar className="">
             <SidebarContent className="pt-14">
@@ -69,12 +67,9 @@ export function UserDashboardSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => {
-                                // const params = new URLSearchParams(searchParams.toString());
-                                // params.set("endpoint_id", endpoint.id.toString());
-                                // const endpointUrl = `${path}/?${params.toString()}`
-                                // const isActive = activeEndpoint === endpoint.id.toString();
-                                // console.log(isActive, activeEndpoint);
-                                return <SidebarMenuItem key={item.url} className={cn(false && "bg-sidebar-accent rounded-md")}>
+                                const isActive = path.includes(item.url);
+                                // console.log(path, item.url,isActive);
+                                return <SidebarMenuItem key={item.url} className={cn(isActive && "bg-sidebar-accent rounded-md")}>
                                     <SidebarMenuButton asChild>
                                         <Link href={item.url}>
                                             <item.icon />

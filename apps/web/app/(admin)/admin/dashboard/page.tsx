@@ -9,6 +9,7 @@ import RevenueGraph from "@/components/admin_dashboard/revenue";
 import Unauthorized from "@/components/ui/unauthorized";
 import Dashboard_Card from "@/components/ui/dashboard_card";
 import { DashboardOverview } from "@repo/types";
+import CustomChart from "@/components/ui/custom-chart";
 
 async function getOverview(id: number) {
     try {
@@ -73,16 +74,28 @@ export default async function Page() {
 
                 </div>
                 <div className="px-6 py-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <RevenueGraph
+                    {/* <RevenueGraph
                         authToken={authToken}
                         title={'Revenue Overview'}
                         description="Platform revenue over time"
+                    /> */}
+                    <CustomChart
+                        url={`${BACKEND_URL}/admin/overview/revenue`}
+                        title={'Revenue Overview'}
+                        description="Platform revenue over time"
+                        valuePrefix="$"
                     />
-                    <RevenueGraph
+                    <CustomChart
+                        url={`${BACKEND_URL}/admin/overview/usage`}
+                        title={'Usage Overview'}
+                        description="Platform Usage over time"
+                    />
+                    {/*  */}
+                    {/* <RevenueGraph
                         authToken={authToken}
                         title={'Revenue Overview'}
                         description="Platform revenue over time"
-                    />
+                    /> */}
                 </div>
 
             </div>

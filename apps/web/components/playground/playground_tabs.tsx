@@ -134,6 +134,7 @@ export default function PlaygroundTabs() {
 
                         const tokenRes = await fetch('/api/token', {
                             method: "POST",
+                            credentials: "include",
                             body: JSON.stringify({
                                 api_key_id: parseInt(selectedHeaderApiKey!)
                             })

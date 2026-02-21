@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconCircleCheck } from "@tabler/icons-react"
+import { IconCheck, IconCircleCheck, IconStar, IconStarFilled } from "@tabler/icons-react"
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import useSWR from "swr"
@@ -12,6 +12,10 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { initializePaddle, Paddle } from "@paddle/paddle-js";
+import { createToken } from "@/lib/create_token";
+import { cn } from "@/lib/utils";
+import PricingCard from "./pricing_card";
+import { useRouter } from "next/navigation";
 
 const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || "sandbox";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!;
@@ -61,12 +65,15 @@ const fetcher = async (url: string) => {
     }
 }
 
-export default function Pricing({ api_slug, authToken }: { api_slug: string, authToken?: string }) {
+export default function Pricing({ api_slug }: { api_slug: string }) {
     const { data, isLoading, error } = useSWR(`${BACKEND_URL}/plans?api_slug=${api_slug}`, fetcher);
     const [paddle, setPaddle] = useState<Paddle | undefined>();
     const [loading, setLoading] = useState(true);
+    const session = useSession();
+    const router = useRouter();
     // Initialize Paddle on mount
     useEffect(() => {
+        if (!session || !session.data?.user.id) return;
         let cancelled = false;
 
         async function init() {
@@ -91,7 +98,7 @@ export default function Pricing({ api_slug, authToken }: { api_slug: string, aut
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [session]);
 
     if (isLoading) {
         return <div className="flex w-full items-center justify-center min-h-5">
@@ -103,74 +110,60 @@ export default function Pricing({ api_slug, authToken }: { api_slug: string, aut
 
 
 
-    const openCheckout = (priceId: string) => {
-        if (!paddle) return;
-        paddle.Checkout.open({
-            items: [
-                {
-                    priceId,
-                    quantity: 1,
-                },
-            ],
-            settings: {
-                displayMode: "overlay", // nice modal overlay
-                successUrl: `${window.location.origin}/checkout/success`,
-            },
-            customData: {
-                user_id: authToken
+    const openCheckout = async (priceId: string) => {
+        try {
+            if (!paddle) {
+                throw new Error("Payment gateway not initialized yet!");
             }
-        });
+            if (!session || !session.data?.user.id) {
+                throw new Error("You must login to perform this operation");
+            }
+            paddle.Checkout.open({
+                items: [
+                    {
+                        priceId,
+                        quantity: 1,
+                    },
+                ],
+                settings: {
+                    displayMode: "overlay",
+                    successUrl: `http://localhost:3000/dashboard/subscriptions`,
+                },
+                customData: {
+                    user_id: await createToken(session.data)
+                }
+            });
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                toast.error(err.message);
+            }
+            else {
+                toast.error("Failed to subscribe");
+            }
+        }
     };
-    return <div className="flex space-x-2 justify-center [&>:nth-child(2)_button]:bg-linear-to-br [&>:nth-child(2)_button]:from-cyan-400 [&>:nth-child(2)_button]:to-cyan-300 [&>:nth-child(2)_button]:text-white dark:[&>:nth-child(2)_button]:text-stone-800 flex-wrap space-y-4">
-        {data != undefined && data.map(plan => {
-            const roundedPrice = Math.floor(plan.price_in_cents / 100);
-            const cents = Math.ceil((((plan.price_in_cents / 100) - Math.floor(plan.price_in_cents / 100)) * 100));
-            return <Card className="min-w-64 p-4 h-fit gap-0 nth-[2]:border nth-[2]:border-cyan-400">
-                <h4 className="text-lg font-medium">{plan.name}</h4>
-                <p className="flex space-x-1 items-baseline py-2">
-                    <span className="text-3xl font-semibold tracking-tighter"> {roundedPrice}</span>
-                    <span className="text-stone-500 ">.{cents}/month</span>
-                </p>
-                <div className="text-sm tracking-tight text-stone-600 my-2 space-y-1">
-                    <div className="flex space-x-1 items-center ">
-                        <span><IconCircleCheck size={18} className="text-green-400" /></span>
-                        <p>{plan.rate_limit} requests/hour</p>
-                    </div>
-                    <div className="flex space-x-1 items-center ">
-                        <span><IconCircleCheck size={18} className="text-green-400" /></span>
-                        <p>{plan.monthly_requests} requests/month</p>
-                    </div>
-                </div>
-                <p className="text-sm my-1">{plan.features}</p>
 
-                {/* <button
-                    onClick={openCheckout}
-                    disabled={loading || !paddle}
-                    style={{
-                        padding: "0.75rem 1.5rem",
-                        borderRadius: "999px",
-                        border: "none",
-                        cursor: loading ? "not-allowed" : "pointer",
-                        fontSize: "1rem",
+    return <div className="flex space-x-2 justify-center flex-wrap space-y-4">
+        {data != undefined && data.map(plan => {
+            return <PricingCard plan={plan} key={plan.id}>
+                {<Button
+                    onClick={() => {
+                        if (!session || !session.data?.user.id) {
+                            router.push('/auth/login');
+                            return;
+                        }
+                        openCheckout(plan.price_id as string);
                     }}
-                >
-                    {loading ? "Loading payment..." : "Buy / Subscribe"}
-                </button> */}
-                {authToken ? <Button
-                    onClick={() => openCheckout(plan.price_id as string)}
-                    disabled={!authToken || loading || !paddle}
-                    className="my-3 nth-[2]:bg-amber-200"
+                    disabled={loading || !paddle}
+                    className={cn(
+                        "my-3",
+                        plan.is_recommended ? "bg-cyan-400 hover:bg-cyan-400/80 text-white dark:bg-cyan-400 dark:hover:bg-cyan-400/80 hover:text-white" : ""
+                    )}
                     variant={'outline'}>
                     Subscribe
-                </Button> : <Button
-                    className="my-3 nth-[2]:bg-amber-200"
-                    variant={'outline'}>
-                    <Link href={`/auth/login`}>
-                        Subscribe
-                    </Link>
                 </Button>}
-
-            </Card>
+            </PricingCard>
         })}
     </div>
 

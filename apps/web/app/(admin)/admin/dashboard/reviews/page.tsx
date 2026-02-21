@@ -10,31 +10,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getReviews } from "@/lib/get_reviews";
 
-async function getReviews({ limit, offset, apiId }: {
-    limit: number,
-    offset: number,
-    apiId?: number
-}) {
-    try {
-        const url = new URL(`${BACKEND_URL}/reviews`);
-        if (limit) url.searchParams.append('limit', limit.toString());
-        if (offset) url.searchParams.append('offset', offset.toString());
-        if (apiId) url.searchParams.append('api_id', apiId.toString());
 
-        const res = await fetch(url);
-        const resData = await res.json();
-        if (!res.ok) {
-            throw new Error(resData.error || resData.message || "Failed to get reviews");
-        }
-        return resData as { results: ReviewResponse[], has_next_page: boolean };
-
-    }
-    catch (err) {
-        throw new Error("Failed to get reviews");
-    }
-
-}
 
 export default async function Page({ searchParams: sp }: {
     searchParams: Promise<{

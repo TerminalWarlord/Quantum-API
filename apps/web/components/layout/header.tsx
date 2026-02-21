@@ -54,10 +54,14 @@ export const Header = () => {
                                     </MenubarItem>
                                     <MenubarSeparator />
                                     <MenubarItem>
-                                        Dashboard
+                                        <Link href={'/dashboard'}>
+                                            Dashboard
+                                        </Link>
                                     </MenubarItem>
                                     <MenubarItem>
-                                        Subscriptions
+                                        <Link href={'/dashboard/subscriptions'}>
+                                            Subscriptions
+                                        </Link>
                                     </MenubarItem>
                                     <MenubarItem>
                                         <button

@@ -40,15 +40,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartAreaDefault({ chartData, children, isLoading, error }: {
+type ChartAreaProps = {
   chartData: { label: string, value: number }[],
   isLoading: boolean,
   error: Error,
-  children: ReactNode
-}) {
+  children: ReactNode,
+  valuePrefix?: string
+}
+export function ChartAreaDefault({ chartData, children, isLoading, error, valuePrefix }: ChartAreaProps) {
   if (error) {
     return <Card className="px-3 flex items-center justify-center gap-2 py-6">
-      <IconExclamationCircle size={30}/>
+      <IconExclamationCircle size={30} />
       {error.message}
     </Card>
   }
@@ -86,13 +88,14 @@ export function ChartAreaDefault({ chartData, children, isLoading, error }: {
               tick={{ fontSize: 12 }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `$${(value / 100).toFixed(0)}`}
+              tickFormatter={(value) => `${valuePrefix ?? ""}${value}`}
               className="text-muted-foreground"
             />
             <ChartTooltip
               content={<ChartTooltipContent formatter={(value) => {
-                const valueInUsd = (Number(value) / 100).toPrecision(3);
-                return `$${valueInUsd.toLocaleString()}`;
+                // const valueInUsd = (Number(value) / 100).toFixed(2);
+                const formattedVal = `${valuePrefix ?? ""}${value}`;
+                return formattedVal;
               }} />}
             />
             <Area

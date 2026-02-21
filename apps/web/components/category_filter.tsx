@@ -79,6 +79,7 @@ const CategoryFilter = () => {
                         data-[state=checked]:bg-cyan-400!
                         data-[state=checked]:text-white
                         dark:data-[state=checked]:text-black
+                        cursor-pointer
                         "
                         checked={isChecked}
                         onCheckedChange={() => onClickHandler(cat.slug)}

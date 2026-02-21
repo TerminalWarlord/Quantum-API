@@ -24,7 +24,7 @@ export function Categories() {
                     Filters
                 </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent className="pt-16">
                 <SheetHeader>
                     <SheetTitle>Categories</SheetTitle>
                 </SheetHeader>

@@ -8,14 +8,12 @@ import { toast } from "sonner";
 export async function submitProfileUpdateForm(
     e: FormEvent<HTMLFormElement>,
     session: Session | null,
-    updateLoadingStatus: (status: boolean) => void
 ) {
     e.preventDefault();
     try {
         if (!session || !session.user.id) {
             throw new Error("Not logged in!");
         }
-        updateLoadingStatus(true);
         const formData = new FormData(e.currentTarget);
         const body = Object.fromEntries(formData.entries())
         const tokenRes = await fetch('/api/token', {
@@ -40,9 +38,10 @@ export async function submitProfileUpdateForm(
         if (!res.ok) {
             throw new Error(resData.error || resData.message || "Failed to update data");
         }
+        // TODO: revalidate user data
     }
     catch (err: any) {
-        toast.error(err.message || "Failed to update profile");
+        // toast.error(err.message || "Failed to update profile");
+        throw new Error(err.message || "Failed to update profile");
     }
-    updateLoadingStatus(false);
 }
